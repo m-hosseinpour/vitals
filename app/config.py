@@ -81,7 +81,8 @@ class Settings:
     password_hash: str
     allowed_hosts: tuple[str, ...]
     cookie_secure: bool
-    session_hours: int
+    session_idle_hours: int
+    session_max_hours: int
     endpoint: str
     packages_url: str
     cache_ttl: int
@@ -91,8 +92,12 @@ class Settings:
     company: AccountConfig
 
     @property
-    def session_seconds(self) -> int:
-        return self.session_hours * 3600
+    def session_idle_seconds(self) -> int:
+        return self.session_idle_hours * 3600
+
+    @property
+    def session_max_seconds(self) -> int:
+        return self.session_max_hours * 3600
 
 
 def load_settings() -> Settings:
@@ -125,12 +130,20 @@ def load_settings() -> Settings:
     if not packages_url.startswith("https://"):
         raise ConfigError("AVALAI_PACKAGES_URL must be an https:// URL")
 
+    session_idle_hours = _int("VITALS_SESSION_IDLE_HOURS", 168, low=1, high=720)
+    session_max_hours = _int("VITALS_SESSION_MAX_HOURS", 720, low=1, high=8760)
+    if session_max_hours < session_idle_hours:
+        raise ConfigError(
+            "VITALS_SESSION_MAX_HOURS must be at least VITALS_SESSION_IDLE_HOURS"
+        )
+
     return Settings(
         secret_key=secret,
         password_hash=password_hash,
         allowed_hosts=hosts,
         cookie_secure=_bool("VITALS_COOKIE_SECURE", True),
-        session_hours=_int("VITALS_SESSION_HOURS", 12, low=1, high=168),
+        session_idle_hours=session_idle_hours,
+        session_max_hours=session_max_hours,
         endpoint=endpoint,
         packages_url=packages_url,
         cache_ttl=_int("VITALS_CACHE_TTL", 60, low=5, high=3600),

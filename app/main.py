@@ -235,7 +235,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         SessionMiddleware,
         secret_key=settings.secret_key,
         session_cookie=cookie_name,
-        max_age=settings.session_seconds,
+        max_age=settings.session_max_seconds,
         path="/",
         same_site="lax",
         https_only=settings.cookie_secure,

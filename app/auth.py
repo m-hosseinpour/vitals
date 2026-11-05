@@ -18,6 +18,10 @@ _hasher = PasswordHasher()
 CSRF_SESSION_KEY = "csrf"
 AUTH_SESSION_KEY = "auth"
 
+# The cookie is re-signed on activity so its Max-Age slides with the session.
+# Throttling the rewrite keeps polling requests from churning the header.
+SESSION_REFRESH_SECONDS = 60
+
 
 def password_fingerprint(password_hash: str) -> str:
     """Ties a session to the current password hash, so rotating the password logs
@@ -61,13 +65,20 @@ def is_authenticated(request: Request, settings: Settings) -> bool:
     if session.get("pw") != password_fingerprint(settings.password_hash):
         session.clear()
         return False
+
+    now = time.time()
     issued_at = session.get("iat")
-    if (
-        not isinstance(issued_at, int)
-        or time.time() - issued_at > settings.session_seconds
-    ):
+    if not isinstance(issued_at, int) or now - issued_at > settings.session_max_seconds:
         session.clear()
         return False
+
+    seen = session.get("seen", issued_at)
+    if not isinstance(seen, int) or now - seen > settings.session_idle_seconds:
+        session.clear()
+        return False
+
+    if now - seen >= SESSION_REFRESH_SECONDS:
+        session["seen"] = int(now)
     return True
 
 
@@ -76,7 +87,9 @@ def start_session(request: Request, settings: Settings) -> None:
     request.session.clear()
     request.session[AUTH_SESSION_KEY] = True
     request.session[CSRF_SESSION_KEY] = new_csrf_token()
-    request.session["iat"] = int(time.time())
+    now = int(time.time())
+    request.session["iat"] = now
+    request.session["seen"] = now
     request.session["pw"] = password_fingerprint(settings.password_hash)
 
 
