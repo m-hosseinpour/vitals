@@ -7,8 +7,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-import jdatetime
-
 TEHRAN = ZoneInfo("Asia/Tehran")
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -45,15 +43,6 @@ def ago(value: datetime | None) -> str:
     if seconds < 86400:
         return f"{int(seconds // 3600)} ساعت پیش"
     return f"{seconds / 86400:.1f} روز پیش"
-
-
-def jalali(value: datetime | None) -> str:
-    if value is None:
-        return "—"
-    local = value.astimezone(TEHRAN)
-    converted = jdatetime.datetime.fromgregorian(datetime=local)
-    month = jdatetime.date.j_months_fa[converted.month - 1]
-    return f"{converted.day} {month} {converted.year}"
 
 
 def clock(value: datetime | None) -> str:

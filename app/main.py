@@ -22,7 +22,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from . import auth
 from .avalai import AccountCredit, CreditService
 from .config import Settings, load_settings
-from .formatting import ago, asset, clock, duration, jalali, money, percent
+from .formatting import ago, asset, clock, duration, money, percent
 from .security import LoginThrottle, SecurityHeadersMiddleware
 
 logger = logging.getLogger("vitals")
@@ -37,7 +37,6 @@ templates.env.filters.update(
         "percent": percent,
         "duration": duration,
         "ago": ago,
-        "jalali": jalali,
         "clock": clock,
     }
 )

@@ -1,9 +1,9 @@
 """Reading AvalAI credit: the HTTP call, the response analysis, and a small cache.
 
 The endpoint is `GET /user/v1/credit` with a bearer key. An account can hold
-several packages of different kinds, and requests are paid from a package before
-the main balance is touched, so the analysis keeps each package and reports the
-sum of what is actually spendable now.
+several packages, and requests are paid from a package before the main balance is
+touched, so the analysis keeps each spendable package separate and leaves the main
+balance as its own number.
 
 Nothing here writes to the provider, and the key never leaves the server.
 """
@@ -26,15 +26,9 @@ from .config import AccountConfig, Settings
 
 logger = logging.getLogger("vitals.avalai")
 
-TIERS = ("daily", "weekly", "other")
-TIER_FA = {"daily": "روزانه", "weekly": "هفتگی", "other": "سایر"}
-TIER_RANK = {"daily": 0, "weekly": 1, "other": 2}
-
-
 @dataclass(frozen=True)
 class Package:
     name: str
-    tier: str
     remaining: float | None
     amount: float | None
     end_date: datetime | None
@@ -44,40 +38,38 @@ class Package:
 
 
 @dataclass(frozen=True)
-class Tier:
-    remaining: float
-    count: int
-    unread: int
-    expires_in: float | None
-
-
-@dataclass(frozen=True)
 class AccountCredit:
     slot: str
     label: str
     configured: bool
     state: str
-    active_tier: str | None
     main_balance: float | None
     packages: tuple[Package, ...]
-    tiers: dict[str, Tier]
     warnings: tuple[str, ...]
     error: str
     source: str
     fetched_at: datetime | None
-    total_remaining: float | None
 
     @property
-    def packages_remaining(self) -> float:
-        return sum(tier.remaining for tier in self.tiers.values())
+    def active_packages(self) -> tuple[Package, ...]:
+        return tuple(package for package in self.packages if package.spendable)
+
+    @property
+    def main_note(self) -> str:
+        if self.main_balance is None:
+            return "خوانده نشد"
+        if self.main_balance <= 0:
+            return "اعتبار اصلی تمام شده"
+        if self.active_packages:
+            return "بعد از بسته‌های فعال مصرف می‌شود"
+        return "اعتبار قابل استفاده"
 
     @property
     def chip_text(self) -> str:
         if not self.configured:
             return "تنظیم نشده"
-        if self.state == "package" and self.active_tier:
-            return f"بسته‌ی {TIER_FA[self.active_tier]} فعال"
         return {
+            "package": "بسته‌های فعال",
             "main": "از اعتبار اصلی",
             "empty": "تمام‌شده",
             "unknown": "نامشخص",
@@ -138,16 +130,6 @@ def _dt(value: Any) -> datetime | None:
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
 
 
-def _tier(package: dict[str, Any]) -> str:
-    template = str(package.get("template_id") or "")
-    name = str(package.get("name") or "")
-    if template.startswith("d-") or "روزانه" in name:
-        return "daily"
-    if template.startswith("w-") or "هفتگی" in name:
-        return "weekly"
-    return "other"
-
-
 def analyze(
     payload: dict[str, Any],
     *,
@@ -187,7 +169,6 @@ def analyze(
         packages.append(
             Package(
                 name=str(raw.get("name") or ""),
-                tier=_tier(raw),
                 remaining=remaining,
                 amount=amount,
                 end_date=end,
@@ -196,31 +177,20 @@ def analyze(
                 percent=percent,
             )
         )
+    # The nearest expiry comes first. Packages without an end date follow the
+    # dated ones; expired packages stay after the live ones, where they are still
+    # counted for the warning about unused money.
     packages.sort(
         key=lambda p: (
-            TIER_RANK[p.tier],
+            not p.spendable,
             p.expires_in if p.expires_in is not None else float("inf"),
         )
     )
 
-    tiers: dict[str, Tier] = {}
-    for tier in TIERS:
-        tier_packages = [p for p in packages if p.tier == tier]
-        live = [p for p in tier_packages if p.spendable]
-        tiers[tier] = Tier(
-            remaining=sum(p.remaining or 0 for p in live),
-            count=len(live),
-            unread=sum(1 for p in tier_packages if p.remaining is None),
-            expires_in=min(
-                (p.expires_in for p in live if p.expires_in is not None),
-                default=None,
-            ),
-        )
-
-    active = next((tier for tier in TIERS if tiers[tier].remaining > 0), None)
-    unread = sum(tiers[tier].unread for tier in TIERS)
+    active_packages = [p for p in packages if p.spendable]
+    unread = sum(1 for p in packages if p.remaining is None)
     main = _num(payload.get("remaining_irt"))
-    if active is not None:
+    if active_packages:
         state = "package"
     elif main is None or unread or malformed:
         state = "unknown"
@@ -233,7 +203,7 @@ def analyze(
     if main is None:
         warnings.append("فیلد اعتبار اصلی در پاسخ AvalAI خوانده نشد؛ صفر فرض نشد.")
     if unread:
-        warnings.append(f"مبلغ {unread} بسته خوانده نشد و در جمع نیامده است.")
+        warnings.append(f"مبلغ {unread} بسته خوانده نشد.")
     if malformed:
         warnings.append("این بخش‌های پاسخ خوانده نشد: " + "، ".join(malformed) + ".")
     grants = sources.get("grants")
@@ -242,7 +212,7 @@ def analyze(
             f"این حساب {len(grants)} آیتم دیگر در grants دارد که نمایش داده نمی‌شود."
         )
     # Money paid for and never used deserves to be visible rather than hidden
-    # behind the tier's "out" line.
+    # behind the account's "out" state.
     burned = [
         p
         for p in packages
@@ -254,26 +224,17 @@ def analyze(
             f"{len(burned)} بسته منقضی شده و {total:,.0f} تومان از آن استفاده نشده."
         )
 
-    total_remaining: float | None
-    if state == "unknown":
-        total_remaining = None
-    else:
-        total_remaining = sum(t.remaining for t in tiers.values()) + (main or 0)
-
     return AccountCredit(
         slot="",
         label="",
         configured=True,
         state=state,
-        active_tier=active,
         main_balance=main,
         packages=tuple(packages),
-        tiers=tiers,
         warnings=tuple(warnings),
         error=error,
         source=source,
         fetched_at=fetched_at,
-        total_remaining=total_remaining,
     )
 
 
@@ -287,15 +248,12 @@ def _unconfigured(account: AccountConfig) -> AccountCredit:
         label=account.label,
         configured=False,
         state="unknown",
-        active_tier=None,
         main_balance=None,
         packages=(),
-        tiers={tier: Tier(0, 0, 0, None) for tier in TIERS},
         warnings=(),
         error="",
         source="none",
         fetched_at=None,
-        total_remaining=None,
     )
 
 
@@ -310,15 +268,12 @@ def _unavailable(
         label=account.label,
         configured=True,
         state="unknown",
-        active_tier=None,
         main_balance=None,
         packages=(),
-        tiers={tier: Tier(0, 0, 0, None) for tier in TIERS},
         warnings=(),
         error=error,
         source=source,
         fetched_at=fetched_at,
-        total_remaining=None,
     )
 
 
