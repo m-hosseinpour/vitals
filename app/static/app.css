@@ -524,18 +524,50 @@ code {
   font-size: 0.67rem;
 }
 
-.refresh-status {
-  margin: 0;
-  font-size: 0.69rem;
+.refresh-btn {
+  width: 9.5rem;
+  white-space: nowrap;
+}
+
+.refresh-btn.is-loading {
   color: var(--muted);
+  pointer-events: none;
 }
 
-.refresh-status:empty {
-  display: none;
+.refresh-btn.is-success {
+  color: var(--ok);
 }
 
-.refresh-status.is-error {
+.refresh-btn.is-error {
   color: var(--danger);
+}
+
+.refresh-btn.is-loading::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: refresh-spin 0.7s linear infinite;
+}
+
+.refresh-btn.is-success::before {
+  content: "✓";
+  font-size: 0.9em;
+}
+
+.refresh-btn.is-error::before {
+  content: "!";
+  font-size: 0.95em;
+  font-weight: 700;
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 #dashboard.is-refreshing #dashboard-content {

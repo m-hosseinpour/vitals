@@ -22,10 +22,11 @@
         <span data-updated-label>{% if updated_at %}{{ updated_at|ago }} ({{ updated_at|clock }}){% else %}—{% endif %}</span>
       </p>
       <p class="meta-note">هر ۱ دقیقه خودکار</p>
-      <p class="refresh-status" id="refresh-status" role="status" aria-live="polite"></p>
     </div>
     <div class="topbar-actions">
-      <a class="btn btn-ghost" href="/" data-refresh>به‌روزرسانی</a>
+      <a class="btn btn-ghost refresh-btn" href="/" data-refresh>
+        <span class="refresh-label" aria-live="polite">به‌روزرسانی</span>
+      </a>
       <form method="post" action="/logout">
         <input type="hidden" name="csrf" value="{{ csrf }}">
         <button class="btn btn-ghost" type="submit">خروج</button>

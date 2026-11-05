@@ -9,16 +9,44 @@
   const INTERVAL_MS = 60000;
   const CHECK_MS = 15000;
   const refreshUrl = dashboard.dataset.refreshUrl;
+  const refreshButton = document.querySelector("[data-refresh]");
+  const refreshLabel = refreshButton?.querySelector(".refresh-label");
+
+  const LABELS = {
+    idle: "به‌روزرسانی",
+    loading: "به‌روزرسانی…",
+    success: "به‌روزرسانی شد",
+    error: "ناموفق",
+  };
+
   let busy = false;
   let lastFetch = Date.now();
+  let resetTimer;
 
-  function setStatus(text, isError) {
-    const status = document.getElementById("refresh-status");
-    if (!status) {
+  function setButtonState(state, message = "") {
+    if (!refreshButton || !refreshLabel) {
       return;
     }
-    status.textContent = text;
-    status.classList.toggle("is-error", Boolean(isError));
+    clearTimeout(resetTimer);
+    refreshButton.classList.toggle("is-loading", state === "loading");
+    refreshButton.classList.toggle("is-success", state === "success");
+    refreshButton.classList.toggle("is-error", state === "error");
+    refreshLabel.textContent = LABELS[state];
+    if (state === "loading") {
+      refreshButton.setAttribute("aria-busy", "true");
+    } else {
+      refreshButton.removeAttribute("aria-busy");
+    }
+    if (state === "error" && message) {
+      refreshButton.title = message;
+    } else {
+      refreshButton.removeAttribute("title");
+    }
+    if (state === "success") {
+      resetTimer = window.setTimeout(() => setButtonState("idle"), 2000);
+    } else if (state === "error") {
+      resetTimer = window.setTimeout(() => setButtonState("idle"), 4000);
+    }
   }
 
   function updateHeaderTimestamp(container) {
@@ -31,13 +59,16 @@
     target.textContent = clock === "—" ? ago : `${ago} (${clock})`;
   }
 
-  async function refresh() {
+  async function refresh(manual) {
     if (busy || document.hidden) {
       return;
     }
     busy = true;
-    dashboard.classList.add("is-refreshing");
-    dashboard.setAttribute("aria-busy", "true");
+    if (manual) {
+      setButtonState("loading");
+      dashboard.classList.add("is-refreshing");
+      dashboard.setAttribute("aria-busy", "true");
+    }
     try {
       const response = await fetch(refreshUrl, {
         headers: { Accept: "text/html" },
@@ -61,20 +92,18 @@
       const imported = document.importNode(next, true);
       current.replaceWith(imported);
       updateHeaderTimestamp(imported);
-      lastFetch = Date.now();
-      setStatus("به‌روزرسانی شد.", false);
-      window.setTimeout(() => {
-        const status = document.getElementById("refresh-status");
-        if (status && status.textContent === "به‌روزرسانی شد.") {
-          status.textContent = "";
-        }
-      }, 2500);
+      if (manual) {
+        setButtonState("success");
+      }
     } catch (error) {
-      setStatus("به‌روزرسانی ممکن نشد؛ اعداد قبلی نمایش داده می‌شوند.", true);
+      setButtonState("error", "به‌روزرسانی ممکن نشد؛ اعداد قبلی نمایش داده می‌شوند.");
     } finally {
       busy = false;
-      dashboard.classList.remove("is-refreshing");
-      dashboard.removeAttribute("aria-busy");
+      lastFetch = Date.now();
+      if (manual) {
+        dashboard.classList.remove("is-refreshing");
+        dashboard.removeAttribute("aria-busy");
+      }
     }
   }
 
@@ -84,8 +113,7 @@
       return;
     }
     event.preventDefault();
-    setStatus("در حال به‌روزرسانی…", false);
-    refresh();
+    refresh(true);
   });
 
   window.setInterval(() => {
@@ -93,7 +121,7 @@
       return;
     }
     if (Date.now() - lastFetch >= INTERVAL_MS) {
-      refresh();
+      refresh(false);
     }
   }, CHECK_MS);
 })();
