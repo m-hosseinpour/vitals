@@ -16,6 +16,10 @@ ENV_FILE = BASE_DIR / ".env"
 load_dotenv(ENV_FILE, override=False)
 
 DEFAULT_ENDPOINT = "https://api.avalai.ir/user/v1/credit"
+DEFAULT_PACKAGES_URL = (
+    "https://chat.avalai.ir/platform/billing/packages"
+    "?marketplace&q=%DA%A9%D8%AF%D8%B1&sort=price"
+)
 
 
 class ConfigError(RuntimeError):
@@ -79,6 +83,7 @@ class Settings:
     cookie_secure: bool
     session_hours: int
     endpoint: str
+    packages_url: str
     cache_ttl: int
     retry_after: int
     http_timeout: float
@@ -116,6 +121,10 @@ def load_settings() -> Settings:
     if not endpoint.startswith("https://"):
         raise ConfigError("AVALAI_CREDIT_ENDPOINT must be an https:// URL")
 
+    packages_url = _text("AVALAI_PACKAGES_URL", DEFAULT_PACKAGES_URL)
+    if not packages_url.startswith("https://"):
+        raise ConfigError("AVALAI_PACKAGES_URL must be an https:// URL")
+
     return Settings(
         secret_key=secret,
         password_hash=password_hash,
@@ -123,6 +132,7 @@ def load_settings() -> Settings:
         cookie_secure=_bool("VITALS_COOKIE_SECURE", True),
         session_hours=_int("VITALS_SESSION_HOURS", 12, low=1, high=168),
         endpoint=endpoint,
+        packages_url=packages_url,
         cache_ttl=_int("VITALS_CACHE_TTL", 60, low=5, high=3600),
         retry_after=_int("VITALS_RETRY_AFTER", 120, low=5, high=3600),
         http_timeout=_float("VITALS_HTTP_TIMEOUT", 12, low=2, high=60),

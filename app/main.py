@@ -121,6 +121,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             {
                 "accounts": accounts,
                 "csrf": auth.csrf_token(request),
+                "packages_url": settings.packages_url,
                 "updated_at": _latest(accounts),
             },
         )

@@ -500,6 +500,17 @@ code {
   white-space: nowrap;
 }
 
+.buy-btn {
+  padding-inline: 14px;
+  white-space: nowrap;
+}
+
+.buy-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
 .refresh-btn.is-loading {
   color: var(--muted);
   pointer-events: none;
@@ -737,6 +748,15 @@ input:focus-visible {
 
   .account-sub {
     padding-inline-start: 0;
+  }
+
+  .buy-btn {
+    width: 44px;
+    padding-inline: 0;
+  }
+
+  .buy-label {
+    display: none;
   }
 
   .login-page {
