@@ -1,7 +1,7 @@
 [project]
 name = "vitals"
 version = "0.1.0"
-description = "A small, password-protected dashboard for AvalAI packages and remaining credit."
+description = "A small, password-protected web dashboard."
 requires-python = ">=3.12"
 dependencies = [
     "argon2-cffi>=25.1.0",

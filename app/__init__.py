@@ -1,1 +1,1 @@
-"""Vitals — a small AvalAI credit dashboard."""
+"""Vitals — a small, password-protected web dashboard."""

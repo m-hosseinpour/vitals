@@ -1,5 +1,5 @@
 [Unit]
-Description=Vitals — AvalAI credit dashboard
+Description=Vitals — personal dashboard
 Documentation=file://@ROOT@/README.md
 After=network-online.target
 Wants=network-online.target
