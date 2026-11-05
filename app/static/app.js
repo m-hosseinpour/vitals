@@ -21,6 +21,16 @@
     status.classList.toggle("is-error", Boolean(isError));
   }
 
+  function updateHeaderTimestamp(container) {
+    const target = document.querySelector("[data-updated-label]");
+    if (!target) {
+      return;
+    }
+    const ago = container?.dataset.updatedAgo || "—";
+    const clock = container?.dataset.updatedClock || "—";
+    target.textContent = clock === "—" ? ago : `${ago} (${clock})`;
+  }
+
   async function refresh() {
     if (busy || document.hidden) {
       return;
@@ -48,7 +58,9 @@
       if (!next || !current) {
         throw new Error("missing dashboard content");
       }
-      current.replaceWith(document.importNode(next, true));
+      const imported = document.importNode(next, true);
+      current.replaceWith(imported);
+      updateHeaderTimestamp(imported);
       lastFetch = Date.now();
       setStatus("به‌روزرسانی شد.", false);
       window.setTimeout(() => {

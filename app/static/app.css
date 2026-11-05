@@ -116,7 +116,30 @@ code {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+}
+
+.topbar-side {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-inline-start: auto;
+  min-width: 0;
+}
+
+.topbar-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .brand {
@@ -489,37 +512,26 @@ code {
   font-variant-numeric: tabular-nums;
 }
 
-.meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 22px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.75rem;
-}
-
-.meta-start {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
 .meta-note,
 .meta-updated {
   margin: 0;
+  font-size: 0.72rem;
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
+.meta-note {
+  font-size: 0.67rem;
+}
+
 .refresh-status {
-  margin: 6px 0 0;
-  min-height: 1.4em;
-  font-size: 0.73rem;
+  margin: 0;
+  font-size: 0.69rem;
   color: var(--muted);
+}
+
+.refresh-status:empty {
+  display: none;
 }
 
 .refresh-status.is-error {
@@ -666,6 +678,31 @@ input:focus-visible {
   }
 }
 
+@media (max-width: 760px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar-side {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-inline-start: 0;
+  }
+
+  .topbar-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 10px;
+  }
+
+  .topbar-actions {
+    justify-content: space-between;
+  }
+}
+
 @media (max-width: 560px) {
   .topbar {
     padding: 18px 14px 8px;
@@ -693,11 +730,6 @@ input:focus-visible {
 
   .card-icon {
     display: none;
-  }
-
-  .meta {
-    align-items: flex-start;
-    flex-direction: column;
   }
 
   .login-page {

@@ -15,10 +15,23 @@
       <strong>ویتالز</strong>
     </span>
   </div>
-  <form method="post" action="/logout">
-    <input type="hidden" name="csrf" value="{{ csrf }}">
-    <button class="btn btn-ghost" type="submit">خروج</button>
-  </form>
+  <div class="topbar-side">
+    <div class="topbar-meta">
+      <p class="meta-updated">
+        آخرین دریافت:
+        <span data-updated-label>{% if updated_at %}{{ updated_at|ago }} ({{ updated_at|clock }}){% else %}—{% endif %}</span>
+      </p>
+      <p class="meta-note">هر ۱ دقیقه خودکار</p>
+      <p class="refresh-status" id="refresh-status" role="status" aria-live="polite"></p>
+    </div>
+    <div class="topbar-actions">
+      <a class="btn btn-ghost" href="/" data-refresh>به‌روزرسانی</a>
+      <form method="post" action="/logout">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <button class="btn btn-ghost" type="submit">خروج</button>
+      </form>
+    </div>
+  </div>
 </header>
 
 <main class="shell" id="dashboard" data-refresh-url="/partials/body">
