@@ -25,5 +25,5 @@ systemctl --user enable --now vitals.service
 systemctl --user --no-pager --full status vitals.service
 
 echo
-echo "Listening on 127.0.0.1:8010. Add deploy/Caddyfile to /etc/caddy/Caddyfile"
-echo "and make sure vitals.m-hosseinpour.ir resolves to this server."
+echo "Listening on 127.0.0.1:8010. See README.md for Caddy, a SSH tunnel,"
+echo "or another way to reach the dashboard."

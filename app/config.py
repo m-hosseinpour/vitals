@@ -110,7 +110,7 @@ def load_settings() -> Settings:
         h.strip() for h in _text("VITALS_ALLOWED_HOSTS").split(",") if h.strip()
     )
     if not hosts:
-        hosts = ("vitals.m-hosseinpour.ir", "localhost", "127.0.0.1")
+        hosts = ("vitals.example.com", "localhost", "127.0.0.1")
 
     endpoint = _text("AVALAI_CREDIT_ENDPOINT", DEFAULT_ENDPOINT)
     if not endpoint.startswith("https://"):
@@ -129,11 +129,11 @@ def load_settings() -> Settings:
         personal=AccountConfig(
             slot="personal",
             key=_text("AVALAI_PERSONAL_API_KEY"),
-            label=_text("AVALAI_PERSONAL_LABEL", "کلید من"),
+            label=_text("AVALAI_PERSONAL_LABEL", "حساب اول"),
         ),
         company=AccountConfig(
             slot="company",
             key=_text("AVALAI_COMPANY_API_KEY"),
-            label=_text("AVALAI_COMPANY_LABEL", "کلید شرکت"),
+            label=_text("AVALAI_COMPANY_LABEL", "حساب دوم"),
         ),
     )
