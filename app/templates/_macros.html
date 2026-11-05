@@ -23,7 +23,7 @@
     </span>
   </div>
   {% if package.percent is not none %}
-    <progress class="bar{% if package.percent <= 20 %} bar-low{% endif %}" value="{{ package.percent|round|int }}" max="100">{{ package.percent|round|int }}٪</progress>
+    <progress class="bar{% if package.percent <= 10 %} bar-critical{% elif package.percent <= 20 %} bar-low{% endif %}" value="{{ package.percent|round|int }}" max="100">{{ package.percent|round|int }}٪</progress>
   {% endif %}
   <div class="pkg-meta">
     <span>

@@ -416,6 +416,14 @@ code {
   background: var(--warn);
 }
 
+.bar-critical::-webkit-progress-value {
+  background: var(--danger);
+}
+
+.bar-critical::-moz-progress-bar {
+  background: var(--danger);
+}
+
 .pkg-meta {
   display: flex;
   justify-content: space-between;
