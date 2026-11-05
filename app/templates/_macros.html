@@ -51,15 +51,13 @@
   <div class="account-head">
     <div class="account-title">
       <span class="account-icon">{{ icon(account.slot) }}</span>
-      <div>
-        <h2>{{ account.label }}</h2>
-        <p class="account-sub">
-          {{ account.source_text }}{% if account.fetched_at %} — {{ account.fetched_at|ago }} ({{ account.fetched_at|clock }}){% endif %}
-        </p>
-      </div>
+      <h2>{{ account.label }}</h2>
     </div>
     <span class="chip chip-{{ account.chip_tone }}"><span class="chip-dot"></span>{{ account.chip_text }}</span>
   </div>
+  <p class="account-sub">
+    {{ account.source_text }}{% if account.fetched_at %} — {{ account.fetched_at|ago }} ({{ account.fetched_at|clock }}){% endif %}
+  </p>
 
   {% if not account.configured %}
     <div class="empty-state">

@@ -25,7 +25,6 @@
   --danger: #b42318;
   --danger-soft: #fdecea;
   --shadow: 0 1px 2px rgb(16 18 25 / 4%), 0 22px 44px -32px rgb(16 18 25 / 28%);
-  --shadow-card: 0 1px 2px rgb(16 18 25 / 4%), 0 10px 24px -22px rgb(16 18 25 / 22%);
   --font: "Vazirmatn", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
@@ -48,7 +47,6 @@
     --danger: #f28b82;
     --danger-soft: #2c1719;
     --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 26px 56px -30px rgb(0 0 0 / 70%);
-    --shadow-card: 0 1px 2px rgb(0 0 0 / 35%), 0 12px 28px -22px rgb(0 0 0 / 60%);
   }
 }
 
@@ -189,20 +187,25 @@ code {
 .accounts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 24px;
+  gap: 24px;
   align-items: start;
 }
 
 .account {
   min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
 }
 
 .account-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 2px;
 }
 
 .account-title {
@@ -237,7 +240,8 @@ code {
 }
 
 .account-sub {
-  margin: 1px 0 0;
+  margin: 0 0 14px;
+  padding-inline-start: 52px;
   font-size: 0.71rem;
   color: var(--muted);
   line-height: 1.6;
@@ -295,10 +299,10 @@ code {
 }
 
 .main-card {
-  background: var(--surface-2);
+  background: color-mix(in oklab, var(--accent) 4%, var(--surface-2));
   border: 1px dashed var(--line-strong);
-  border-radius: 16px;
-  padding: 15px 16px;
+  border-radius: 13px;
+  padding: 13px 14px;
   display: grid;
   gap: 4px;
 }
@@ -343,11 +347,10 @@ code {
 }
 
 .pkg-card {
-  background: var(--surface);
+  background: var(--surface-2);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 15px 16px;
-  box-shadow: var(--shadow-card);
+  border-radius: 13px;
+  padding: 13px 14px;
   display: grid;
   gap: 7px;
 }
@@ -695,6 +698,11 @@ input:focus-visible {
     padding: 16px 14px 44px;
   }
 
+  .account {
+    padding: 16px;
+    border-radius: 17px;
+  }
+
   .brand-mark {
     width: 40px;
     height: 40px;
@@ -708,6 +716,10 @@ input:focus-visible {
 
   .account-icon {
     display: none;
+  }
+
+  .account-sub {
+    padding-inline-start: 0;
   }
 
   .login-page {
