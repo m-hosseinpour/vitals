@@ -61,7 +61,7 @@ class AccountCredit:
         if self.main_balance <= 0:
             return "اعتبار اصلی تمام شده"
         if self.active_packages:
-            return "بعد از بسته‌های فعال مصرف می‌شود"
+            return ""
         return "اعتبار قابل استفاده"
 
     @property

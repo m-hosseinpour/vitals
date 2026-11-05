@@ -463,13 +463,6 @@ code {
   border-color: color-mix(in oklab, var(--danger) 22%, transparent);
 }
 
-.account-foot {
-  margin: 14px 0 0;
-  font-size: 0.68rem;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .meta-note,
 .meta-updated {
   margin: 0;

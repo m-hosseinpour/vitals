@@ -53,7 +53,9 @@
       <span class="account-icon">{{ icon(account.slot) }}</span>
       <div>
         <h2>{{ account.label }}</h2>
-        <p class="account-sub">{{ account.source_text }}</p>
+        <p class="account-sub">
+          {{ account.source_text }}{% if account.fetched_at %} — {{ account.fetched_at|ago }} ({{ account.fetched_at|clock }}){% endif %}
+        </p>
       </div>
     </div>
     <span class="chip chip-{{ account.chip_tone }}"><span class="chip-dot"></span>{{ account.chip_text }}</span>
@@ -88,7 +90,7 @@
         <div class="main-value">
           {% if account.main_balance is none %}—{% else %}{{ account.main_balance|money }} <small>تومان</small>{% endif %}
         </div>
-        <p class="main-note">{{ account.main_note }}</p>
+        {% if account.main_note %}<p class="main-note">{{ account.main_note }}</p>{% endif %}
       </article>
     </div>
   {% endif %}
@@ -102,9 +104,5 @@
   {% for warning in account.warnings %}
     <p class="notice notice-warn">{{ warning }}</p>
   {% endfor %}
-
-  {% if account.fetched_at %}
-    <p class="account-foot">دریافت {{ account.fetched_at|ago }} — ساعت {{ account.fetched_at|clock }}</p>
-  {% endif %}
 </article>
 {% endmacro %}
