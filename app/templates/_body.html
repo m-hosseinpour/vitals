@@ -1,0 +1,18 @@
+{% import "_macros.html" as ui %}
+<div id="dashboard-content">
+  <div class="accounts">
+    {% for account in accounts %}{{ ui.account_card(account) }}{% endfor %}
+  </div>
+
+  <div class="meta">
+    <div class="meta-start">
+      <a class="btn btn-ghost" href="/" data-refresh>به‌روزرسانی</a>
+      <span class="meta-note">هر ۱ دقیقه خودکار</span>
+    </div>
+    <p class="meta-updated">
+      آخرین دریافت:
+      {% if updated_at %}{{ updated_at|ago }} ({{ updated_at|clock }}){% else %}—{% endif %}
+    </p>
+  </div>
+  <p class="refresh-status" id="refresh-status" role="status" aria-live="polite"></p>
+</div>

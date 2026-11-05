@@ -1,0 +1,129 @@
+{% macro icon(slot) %}
+  {% if slot == "personal" %}
+    <svg class="card-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.4"></circle>
+      <path d="M5.2 19.2a6.8 6.8 0 0 1 13.6 0"></path>
+    </svg>
+  {% else %}
+    <svg class="card-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 20V6.5A1.5 1.5 0 0 1 5.5 5h7A1.5 1.5 0 0 1 14 6.5V20"></path>
+      <path d="M14 10h4.5A1.5 1.5 0 0 1 20 11.5V20"></path>
+      <path d="M2.5 20h19"></path>
+      <path d="M7.5 9h3M7.5 13h3M7.5 17h3M17 14h.01M17 17h.01"></path>
+    </svg>
+  {% endif %}
+{% endmacro %}
+
+{% macro package_row(package) %}
+<li class="pkg{% if not package.spendable %} pkg-dead{% endif %}">
+  <div class="pkg-top">
+    <span class="pkg-name">{{ package.name or "بسته‌ی بدون نام" }}</span>
+    <span class="pkg-value">{{ package.remaining|money }} <small>تومان</small></span>
+  </div>
+  {% if package.percent is not none %}
+    <progress class="bar{% if not package.spendable %} bar-dead{% elif package.percent <= 20 %} bar-low{% endif %}" value="{{ package.percent|round|int }}" max="100">{{ package.percent|round|int }}٪</progress>
+  {% endif %}
+  <div class="pkg-meta">
+    <span>
+      {% if package.remaining is none %}
+        مبلغ خوانده نشد
+      {% elif package.amount %}
+        {{ package.percent|percent }} از {{ package.amount|money }} تومان
+      {% else %}
+        مبلغ کل نامعلوم
+      {% endif %}
+    </span>
+    <span>
+      {% if not package.spendable %}
+        {% if package.remaining and package.remaining > 0 %}منقضی شده{% else %}خالی{% endif %}
+      {% elif package.expires_in is not none %}
+        تا {{ package.expires_in|duration }} دیگر
+      {% else %}
+        بدون تاریخ انقضا
+      {% endif %}
+    </span>
+  </div>
+  {% if package.end_date %}
+    <span class="pkg-date">پایان: {{ package.end_date|jalali }}</span>
+  {% endif %}
+</li>
+{% endmacro %}
+
+{% macro account_card(account) %}
+<article class="card" data-slot="{{ account.slot }}">
+  <div class="card-head">
+    <div class="card-title">
+      <span class="card-icon">{{ icon(account.slot) }}</span>
+      <div>
+        <h2>{{ account.label }}</h2>
+        <p class="card-sub">{{ account.source_text }}</p>
+      </div>
+    </div>
+    <span class="chip chip-{{ account.chip_tone }}"><span class="chip-dot"></span>{{ account.chip_text }}</span>
+  </div>
+
+  {% if not account.configured %}
+    <div class="empty-state">
+      <p>کلید API این بخش تنظیم نشده است.</p>
+      <p class="empty-hint">
+        مقدار
+        <code dir="ltr">AVALAI_{{ "PERSONAL" if account.slot == "personal" else "COMPANY" }}_API_KEY</code>
+        را در فایل <code dir="ltr">.env</code> بگذارید و سرویس را دوباره راه‌اندازی کنید.
+      </p>
+    </div>
+  {% else %}
+    <div class="amount-block">
+      <div class="amount">
+        {% if account.total_remaining is none %}
+          <span class="amount-value amount-unknown">نامعلوم</span>
+        {% else %}
+          <span class="amount-value">{{ account.total_remaining|money }}</span>
+          <span class="amount-unit">تومان</span>
+        {% endif %}
+      </div>
+      <p class="amount-note">
+        {% if account.total_remaining is none %}جمع اعتبار قابل محاسبه نیست.
+        {% elif account.main_balance is none %}مجموع بسته‌های فعال؛ اعتبار اصلی خوانده نشد.
+        {% else %}مجموع بسته‌های فعال و اعتبار اصلی{% endif %}
+      </p>
+    </div>
+
+    {% if account.fetched_at is none %}
+      <p class="no-packages">اطلاعات این حساب دریافت نشد.</p>
+    {% else %}
+      <dl class="split">
+        <div>
+          <dt>بسته‌ها</dt>
+          <dd>{{ account.packages_remaining|money }}</dd>
+        </div>
+        <div>
+          <dt>اعتبار اصلی</dt>
+          <dd>{{ account.main_balance|money }}</dd>
+        </div>
+      </dl>
+
+      {% if account.packages %}
+        <ul class="packages">
+          {% for package in account.packages %}{{ package_row(package) }}{% endfor %}
+        </ul>
+      {% else %}
+        <p class="no-packages">هیچ بسته‌ای روی این حساب نیست.</p>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% if account.error %}
+    <p class="notice notice-warn" role="status">
+      {{ account.error }}
+      {% if account.source == "stale" %}اعداد از آخرین دریافت موفق هستند.{% endif %}
+    </p>
+  {% endif %}
+  {% for warning in account.warnings %}
+    <p class="notice notice-warn">{{ warning }}</p>
+  {% endfor %}
+
+  {% if account.fetched_at %}
+    <p class="card-foot">دریافت {{ account.fetched_at|ago }} — ساعت {{ account.fetched_at|clock }}</p>
+  {% endif %}
+</article>
+{% endmacro %}

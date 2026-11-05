@@ -1,0 +1,28 @@
+# Append this block to /etc/caddy/Caddyfile (system Caddy), then:
+#   sudo caddy validate --config /etc/caddy/Caddyfile
+#   sudo systemctl reload caddy
+#
+# Caddy obtains and renews the TLS certificate automatically, so DNS must point
+# vitals.m-hosseinpour.ir at this server before the reload.
+vitals.m-hosseinpour.ir {
+	encode zstd gzip
+
+	# The app sets its own security headers too; this keeps them on responses
+	# produced by Caddy itself and removes the server banner.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# Login and logout are the only bodies this app accepts, and both are tiny.
+	request_body {
+		max_size 64KB
+	}
+
+	reverse_proxy 127.0.0.1:8010 {
+		header_up X-Real-IP {remote_host}
+	}
+}

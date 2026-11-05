@@ -1,0 +1,27 @@
+[Unit]
+Description=Vitals — AvalAI credit dashboard
+Documentation=file://@ROOT@/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=@ROOT@
+ExecStart=@ROOT@/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8010 --no-server-header --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=on-failure
+RestartSec=5s
+UMask=0077
+
+# The app only reads its code and .env, and listens on loopback.
+NoNewPrivileges=yes
+PrivateTmp=yes
+# PrivateDevices=yes needs privileges the per-user manager does not have on this
+# host; it fails the unit at exec time with status 218/CAPABILITIES.
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=default.target
