@@ -215,6 +215,39 @@ code {
   min-width: 0;
 }
 
+.account-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.account-buy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.account-buy svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.account-buy:hover {
+  color: var(--accent);
+}
+
+.account-buy:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .account-icon {
   width: 40px;
   height: 40px;
@@ -500,17 +533,6 @@ code {
   white-space: nowrap;
 }
 
-.buy-btn {
-  padding-inline: 14px;
-  white-space: nowrap;
-}
-
-.buy-icon {
-  width: 17px;
-  height: 17px;
-  flex: 0 0 auto;
-}
-
 .refresh-btn.is-loading {
   color: var(--muted);
   pointer-events: none;
@@ -748,15 +770,6 @@ input:focus-visible {
 
   .account-sub {
     padding-inline-start: 0;
-  }
-
-  .buy-btn {
-    width: 44px;
-    padding-inline: 0;
-  }
-
-  .buy-label {
-    display: none;
   }
 
   .login-page {

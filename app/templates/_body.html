@@ -5,6 +5,6 @@
   data-updated-clock="{{ updated_at|clock }}"
 >
   <div class="accounts">
-    {% for account in accounts %}{{ ui.account_card(account) }}{% endfor %}
+    {% for account in accounts %}{{ ui.account_card(account, packages_url) }}{% endfor %}
   </div>
 </div>

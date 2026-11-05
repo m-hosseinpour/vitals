@@ -136,7 +136,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return _render(
             request,
             "_body.html",
-            {"accounts": accounts, "updated_at": _latest(accounts)},
+            {
+                "accounts": accounts,
+                "packages_url": settings.packages_url,
+                "updated_at": _latest(accounts),
+            },
         )
 
     @app.get("/login", response_class=HTMLResponse)

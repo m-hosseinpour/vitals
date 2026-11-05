@@ -46,14 +46,23 @@
 </article>
 {% endmacro %}
 
-{% macro account_card(account) %}
+{% macro account_card(account, packages_url) %}
 <article class="account" data-slot="{{ account.slot }}">
   <div class="account-head">
     <div class="account-title">
       <span class="account-icon">{{ icon(account.slot) }}</span>
       <h2>{{ account.label }}</h2>
     </div>
-    <span class="chip chip-{{ account.chip_tone }}"><span class="chip-dot"></span>{{ account.chip_text }}</span>
+    <div class="account-tools">
+      <span class="chip chip-{{ account.chip_tone }}"><span class="chip-dot"></span>{{ account.chip_text }}</span>
+      <a class="account-buy" href="{{ packages_url }}" target="_blank" rel="noopener noreferrer" title="خرید بسته از AvalAI">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5.5 8h13l-1 11.4a1.6 1.6 0 0 1-1.6 1.6H8.1a1.6 1.6 0 0 1-1.6-1.6z"></path>
+          <path d="M9 8V6.5a3 3 0 0 1 6 0V8"></path>
+        </svg>
+        خرید بسته
+      </a>
+    </div>
   </div>
   <p class="account-sub">
     {{ account.source_text }}{% if account.fetched_at %} — {{ account.fetched_at|ago }} ({{ account.fetched_at|clock }}){% endif %}

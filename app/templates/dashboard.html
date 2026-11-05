@@ -27,13 +27,6 @@
       <a class="btn btn-ghost refresh-btn" href="/" data-refresh>
         <span class="refresh-label" aria-live="polite">به‌روزرسانی</span>
       </a>
-      <a class="btn btn-ghost buy-btn" href="{{ packages_url }}" target="_blank" rel="noopener noreferrer" aria-label="خرید بسته از AvalAI" title="خرید بسته از AvalAI">
-        <svg class="buy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5.5 8h13l-1 11.4a1.6 1.6 0 0 1-1.6 1.6H8.1a1.6 1.6 0 0 1-1.6-1.6z"></path>
-          <path d="M9 8V6.5a3 3 0 0 1 6 0V8"></path>
-        </svg>
-        <span class="buy-label">خرید بسته</span>
-      </a>
       <form method="post" action="/logout">
         <input type="hidden" name="csrf" value="{{ csrf }}">
         <button class="btn btn-ghost" type="submit">خروج</button>
