@@ -59,10 +59,8 @@ class AccountCredit:
         if self.main_balance is None:
             return "خوانده نشد"
         if self.main_balance <= 0:
-            return "اعتبار اصلی تمام شده"
-        if self.active_packages:
-            return ""
-        return "اعتبار قابل استفاده"
+            return "تمام شده"
+        return ""
 
     @property
     def chip_text(self) -> str:

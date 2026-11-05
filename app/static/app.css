@@ -302,36 +302,43 @@ code {
   background: color-mix(in oklab, var(--accent) 4%, var(--surface-2));
   border: 1px dashed var(--line-strong);
   border-radius: 13px;
-  padding: 13px 14px;
-  display: grid;
-  gap: 4px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .main-head {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   color: var(--muted);
 }
 
 .main-icon {
   width: 18px;
   height: 18px;
+  flex: 0 0 auto;
   color: var(--accent);
 }
 
 .main-label {
+  flex: 0 0 auto;
   font-size: 0.76rem;
   font-weight: 600;
   color: var(--ink);
 }
 
 .main-value {
-  font-size: 1.3rem;
+  flex: 0 0 auto;
+  font-size: 1.15rem;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.3;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .main-value small {
@@ -341,9 +348,11 @@ code {
 }
 
 .main-note {
-  margin: 0;
   font-size: 0.7rem;
   color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pkg-card {
