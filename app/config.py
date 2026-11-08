@@ -85,6 +85,8 @@ class Settings:
     session_max_hours: int
     endpoint: str
     packages_url: str
+    disk_path: str
+    disk_threshold_gib: float
     cache_ttl: int
     retry_after: int
     http_timeout: float
@@ -130,6 +132,12 @@ def load_settings() -> Settings:
     if not packages_url.startswith("https://"):
         raise ConfigError("AVALAI_PACKAGES_URL must be an https:// URL")
 
+    # No existence check: a mount can appear after the service starts, and the card
+    # shows a read failure rather than the process refusing to boot.
+    disk_path = _text("VITALS_DISK_PATH", "/")
+    if not disk_path:
+        raise ConfigError("VITALS_DISK_PATH must not be empty")
+
     session_idle_hours = _int("VITALS_SESSION_IDLE_HOURS", 168, low=1, high=720)
     session_max_hours = _int("VITALS_SESSION_MAX_HOURS", 720, low=1, high=8760)
     if session_max_hours < session_idle_hours:
@@ -146,6 +154,10 @@ def load_settings() -> Settings:
         session_max_hours=session_max_hours,
         endpoint=endpoint,
         packages_url=packages_url,
+        disk_path=disk_path,
+        disk_threshold_gib=_float(
+            "VITALS_DISK_THRESHOLD_GIB", 2.0, low=0.1, high=1_000_000
+        ),
         cache_ttl=_int("VITALS_CACHE_TTL", 60, low=5, high=3600),
         retry_after=_int("VITALS_RETRY_AFTER", 120, low=5, high=3600),
         http_timeout=_float("VITALS_HTTP_TIMEOUT", 12, low=2, high=60),

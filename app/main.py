@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -22,6 +23,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from . import auth
 from .avalai import AccountCredit, CreditService
 from .config import Settings, load_settings
+from .disk import read_disk
 from .formatting import ago, asset, clock, duration, money, percent
 from .security import LoginThrottle, SecurityHeadersMiddleware
 
@@ -120,6 +122,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "dashboard.html",
             {
                 "accounts": accounts,
+                "disk": await asyncio.to_thread(
+                    read_disk, settings.disk_path, settings.disk_threshold_gib
+                ),
                 "csrf": auth.csrf_token(request),
                 "packages_url": settings.packages_url,
                 "updated_at": _latest(accounts),
@@ -138,6 +143,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "_body.html",
             {
                 "accounts": accounts,
+                "disk": await asyncio.to_thread(
+                    read_disk, settings.disk_path, settings.disk_threshold_gib
+                ),
                 "packages_url": settings.packages_url,
                 "updated_at": _latest(accounts),
             },

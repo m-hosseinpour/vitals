@@ -191,6 +191,12 @@ code {
   align-items: start;
 }
 
+.system {
+  display: grid;
+  gap: 24px;
+  margin-top: 24px;
+}
+
 .account {
   min-width: 0;
   background: var(--surface);
