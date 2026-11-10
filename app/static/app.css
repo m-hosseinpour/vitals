@@ -111,7 +111,7 @@ code {
 .topbar {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 26px 24px 10px;
+  padding: 20px 24px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -181,22 +181,31 @@ code {
 .shell {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 22px 24px 56px;
+  padding: 18px 24px 32px;
 }
 
 .accounts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
+  gap: 18px;
   align-items: start;
 }
 
+/* The pulse list is grouped into two columns, so its card is about half as tall
+   and can share one row with the short disk card instead of leaving the space
+   under the disk empty. */
 .system {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  align-items: start;
-  margin-top: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+  margin-top: 16px;
+}
+
+@media (min-width: 1080px) {
+  .system {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
+  }
 }
 
 .account {
@@ -204,7 +213,7 @@ code {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 20px;
-  padding: 20px;
+  padding: 16px;
   box-shadow: var(--shadow);
 }
 
@@ -281,7 +290,7 @@ code {
 }
 
 .account-sub {
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   padding-inline-start: 52px;
   font-size: 0.71rem;
   color: var(--muted);
@@ -394,6 +403,59 @@ code {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The disk card shares a row with the taller pulse card. Its gauge grows to the
+   row height and centers the free-space figure, so the card reads as one tile
+   instead of leaving an empty block under the bar. */
+.disk-card .account-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* Cards in the system row share one height, so a card whose message is short —
+   the pulse's empty state, a disk error — centers that message instead of
+   hugging the top of the taller card. */
+.system > .account {
+  display: flex;
+  flex-direction: column;
+}
+
+.system > .account > .empty-state,
+.system > .account > .notice {
+  margin-block: auto;
+}
+
+.disk-card .main-card {
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.disk-card .main-head {
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.disk-card .main-value {
+  font-size: 1.8rem;
+  letter-spacing: -0.02em;
+}
+
+.disk-card .main-value small {
+  font-size: 0.8rem;
+}
+
+.disk-card .pkg-meta {
+  flex-direction: column;
+  gap: 2px;
 }
 
 .pkg-card {
@@ -532,11 +594,23 @@ code {
   gap: 8px;
 }
 
+/* Two columns of short rows read as three rows; the jobs keep their order down
+   each column, right column first. The three rows match the five fixed jobs in
+   pulse.py. */
+@media (min-width: 1080px) {
+  .pulse-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+    column-gap: 10px;
+  }
+}
+
 .pulse-row {
   background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 13px;
-  padding: 10px 13px;
+  padding: 9px 12px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -776,10 +850,6 @@ input:focus-visible {
 
 @media (max-width: 899px) {
   .accounts {
-    grid-template-columns: 1fr;
-  }
-
-  .system {
     grid-template-columns: 1fr;
   }
 }
