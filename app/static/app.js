@@ -64,6 +64,9 @@
       return;
     }
     busy = true;
+    // Stamped at the start, not the end: otherwise every poll would push the
+    // next one out by its own duration and the cadence would drift past 30s.
+    lastFetch = Date.now();
     if (manual) {
       setButtonState("loading");
       dashboard.classList.add("is-refreshing");
@@ -99,7 +102,6 @@
       setButtonState("error", "به‌روزرسانی ممکن نشد؛ اعداد قبلی نمایش داده می‌شوند.");
     } finally {
       busy = false;
-      lastFetch = Date.now();
       if (manual) {
         dashboard.classList.remove("is-refreshing");
         dashboard.removeAttribute("aria-busy");
