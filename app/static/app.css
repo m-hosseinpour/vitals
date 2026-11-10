@@ -181,7 +181,7 @@ code {
 .shell {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 18px 24px 32px;
+  padding: 18px 24px 26px;
 }
 
 .accounts {
@@ -290,7 +290,7 @@ code {
 }
 
 .account-sub {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   padding-inline-start: 52px;
   font-size: 0.71rem;
   color: var(--muted);
@@ -343,8 +343,12 @@ code {
   gap: 12px;
 }
 
+/* Two packages fit side by side instead of stacking, so a second package does
+   not push the system row off the first screen. The track collapses back to one
+   column when the account card is too narrow or holds a single package. */
 .package-list {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
 }
 
@@ -591,7 +595,7 @@ code {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 8px;
+  gap: 7px;
 }
 
 /* Two columns of short rows read as three rows; the jobs keep their order down
@@ -613,7 +617,7 @@ code {
   background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 13px;
-  padding: 9px 12px;
+  padding: 8px 12px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
