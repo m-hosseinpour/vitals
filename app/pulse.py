@@ -67,7 +67,9 @@ class PulseRow:
             return "never"
         if self.record.failed > 0:
             return "failed"
-        if not self.record.producers:
+        # Per row, not per run: one of the `--only` names may not have been built
+        # while another was. A row whose own producer never ran is not "quiet".
+        if self.name not in self.record.producers:
             return "unbuilt"
         return "ok"
 
@@ -110,11 +112,16 @@ def _timestamp(value: object) -> datetime | None:
         return None
     try:
         parsed = datetime.fromisoformat(value)
-    except ValueError:
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+        parsed = parsed.astimezone(UTC)
+    except (ValueError, OverflowError):
         return None
-    if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=UTC)
-    return parsed.astimezone(UTC)
+    # A run log exists to show recent runs. A year far outside that is a broken
+    # line, and converting an extreme date for display could overflow the page.
+    if not 2000 <= parsed.year <= 2100:
+        return None
+    return parsed
 
 
 def _names(value: object) -> list[str] | None:
@@ -134,7 +141,8 @@ def parse_line(line: str) -> RunRecord | None:
     """One line of the log, or ``None`` when it cannot be read as a run record."""
     try:
         raw = json.loads(line)
-    except ValueError:
+    except (ValueError, RecursionError):
+        # Deeply nested input raises RecursionError; one bad line is skipped, not fatal.
         return None
     if not isinstance(raw, dict):
         return None
@@ -202,7 +210,9 @@ def read_pulse(path: str) -> Pulse:
         text = Path(path).read_text(encoding="utf-8")
     except FileNotFoundError:
         return Pulse(state="missing")
-    except (OSError, UnicodeError) as exc:
+    except (OSError, ValueError) as exc:
+        # ValueError covers an embedded NUL in the configured path and invalid
+        # UTF-8 in the file; neither may take the dashboard down.
         reason = getattr(exc, "strerror", None) or str(exc)
         return Pulse(
             state="error", error=f"خواندن فایل نبض ربات ممکن نشد: {reason}"
