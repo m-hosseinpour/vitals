@@ -603,6 +603,9 @@ code {
     grid-template-rows: repeat(3, auto);
     grid-auto-flow: column;
     column-gap: 10px;
+    /* A row with a sender error is taller than its pair; keep the healthy row
+       at its own height instead of stretching it into an empty box. */
+    align-items: start;
   }
 }
 
