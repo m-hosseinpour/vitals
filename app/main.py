@@ -25,6 +25,7 @@ from .avalai import AccountCredit, CreditService
 from .config import Settings, load_settings
 from .disk import read_disk
 from .formatting import ago, asset, clock, duration, money, percent
+from .pulse import read_pulse
 from .security import LoginThrottle, SecurityHeadersMiddleware
 
 logger = logging.getLogger("vitals")
@@ -125,6 +126,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "disk": await asyncio.to_thread(
                     read_disk, settings.disk_path, settings.disk_threshold_gib
                 ),
+                "pulse": await asyncio.to_thread(read_pulse, settings.pulse_path),
                 "csrf": auth.csrf_token(request),
                 "packages_url": settings.packages_url,
                 "updated_at": _latest(accounts),
@@ -146,6 +148,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "disk": await asyncio.to_thread(
                     read_disk, settings.disk_path, settings.disk_threshold_gib
                 ),
+                "pulse": await asyncio.to_thread(read_pulse, settings.pulse_path),
                 "packages_url": settings.packages_url,
                 "updated_at": _latest(accounts),
             },

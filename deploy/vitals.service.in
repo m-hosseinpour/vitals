@@ -12,8 +12,8 @@ Restart=on-failure
 RestartSec=5s
 UMask=0077
 
-# The app reads its code, .env, and the filesystem stats of VITALS_DISK_PATH, and
-# listens on loopback.
+# The app reads its code, .env, the filesystem stats of VITALS_DISK_PATH, the Bale
+# crier's run log at VITALS_PULSE_PATH, and listens on loopback.
 NoNewPrivileges=yes
 PrivateTmp=yes
 # PrivateDevices=yes needs privileges the per-user manager does not have on this

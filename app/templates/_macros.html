@@ -22,6 +22,65 @@
   </svg>
 {% endmacro %}
 
+{% macro pulse_icon() %}
+  <svg class="account-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M3 12h3.2l1.9-4.8 3.4 9.6 1.9-4.8H21"></path>
+  </svg>
+{% endmacro %}
+
+{% macro pulse_card(pulse) %}
+<article class="account">
+  <div class="account-head">
+    <div class="account-title">
+      <span class="account-icon">{{ pulse_icon() }}</span>
+      <h2>نبض ربات</h2>
+    </div>
+  </div>
+  <p class="account-sub">آخرین اجرای هر کار ربات، از فایل اجرای قاصد؛ اجراهای بی‌صدا هم ثبت می‌شوند.</p>
+
+  {% if pulse.state == "unconfigured" %}
+    <div class="empty-state">
+      <p>مسیر فایل نبض ربات تنظیم نشده است.</p>
+      <p class="empty-hint">
+        مقدار
+        <code dir="ltr">VITALS_PULSE_PATH</code>
+        را در فایل <code dir="ltr">.env</code> بگذارید و سرویس را دوباره راه‌اندازی کنید.
+      </p>
+    </div>
+  {% elif pulse.state == "missing" %}
+    <div class="empty-state">
+      <p>فایل نبض ربات پیدا نشد؛ هنوز اجرایی ثبت نشده است.</p>
+      <p class="empty-hint">اگر ربات تازه راه افتاده، این حالت با اولین اجرا پر می‌شود.</p>
+    </div>
+  {% elif pulse.state == "error" %}
+    <p class="notice notice-error" role="status">{{ pulse.error }}</p>
+  {% else %}
+    {% if pulse.ignored %}
+      <p class="notice notice-warn" role="status">{{ pulse.ignored }} خط ناخوانا در فایل نبض نادیده گرفته شد.</p>
+    {% endif %}
+    <ul class="pulse-list">
+      {% for row in pulse.rows %}
+        <li class="pulse-row">
+          <div class="pulse-main">
+            <span class="pulse-label">{{ row.label }}</span>
+            <span class="pulse-time">
+              {% if row.record %}{{ row.record.ts|ago }} ({{ row.record.ts|clock }}){% else %}—{% endif %}
+            </span>
+          </div>
+          <div class="pulse-side">
+            <span class="pulse-count">{{ row.count_text }}</span>
+            <span class="chip chip-{{ row.chip_tone }}"><span class="chip-dot"></span>{{ row.chip_text }}</span>
+          </div>
+          {% if row.error %}
+            <p class="notice notice-error pulse-error" role="status">{{ row.error }}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</article>
+{% endmacro %}
+
 {% macro disk_card(disk) %}
 <article class="account">
   <div class="account-head">

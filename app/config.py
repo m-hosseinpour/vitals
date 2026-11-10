@@ -87,6 +87,7 @@ class Settings:
     packages_url: str
     disk_path: str
     disk_threshold_gib: float
+    pulse_path: str
     cache_ttl: int
     retry_after: int
     http_timeout: float
@@ -138,6 +139,10 @@ def load_settings() -> Settings:
     if not disk_path:
         raise ConfigError("VITALS_DISK_PATH must not be empty")
 
+    # Empty means the bot pulse is not set up, and the card says so. No existence
+    # check: the crier may not have run yet, and the card has a state for that.
+    pulse_path = _text("VITALS_PULSE_PATH")
+
     session_idle_hours = _int("VITALS_SESSION_IDLE_HOURS", 168, low=1, high=720)
     session_max_hours = _int("VITALS_SESSION_MAX_HOURS", 720, low=1, high=8760)
     if session_max_hours < session_idle_hours:
@@ -158,6 +163,7 @@ def load_settings() -> Settings:
         disk_threshold_gib=_float(
             "VITALS_DISK_THRESHOLD_GIB", 2.0, low=0.1, high=1_000_000
         ),
+        pulse_path=pulse_path,
         cache_ttl=_int("VITALS_CACHE_TTL", 60, low=5, high=3600),
         retry_after=_int("VITALS_RETRY_AFTER", 120, low=5, high=3600),
         http_timeout=_float("VITALS_HTTP_TIMEOUT", 12, low=2, high=60),

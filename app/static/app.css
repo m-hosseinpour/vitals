@@ -522,6 +522,64 @@ code {
   border-color: color-mix(in oklab, var(--danger) 22%, transparent);
 }
 
+.pulse-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.pulse-row {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 10px 13px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.pulse-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.pulse-label {
+  font-size: 0.87rem;
+  font-weight: 550;
+  line-height: 1.6;
+}
+
+.pulse-time {
+  font-size: 0.71rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pulse-side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.pulse-count {
+  font-size: 0.74rem;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pulse-error {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
 .meta-note,
 .meta-updated {
   margin: 0;
