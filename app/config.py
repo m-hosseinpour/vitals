@@ -164,7 +164,7 @@ def load_settings() -> Settings:
             "VITALS_DISK_THRESHOLD_GIB", 2.0, low=0.1, high=1_000_000
         ),
         pulse_path=pulse_path,
-        cache_ttl=_int("VITALS_CACHE_TTL", 60, low=5, high=3600),
+        cache_ttl=_int("VITALS_CACHE_TTL", 30, low=5, high=3600),
         retry_after=_int("VITALS_RETRY_AFTER", 120, low=5, high=3600),
         http_timeout=_float("VITALS_HTTP_TIMEOUT", 12, low=2, high=60),
         personal=AccountConfig(

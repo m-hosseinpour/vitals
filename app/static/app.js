@@ -6,8 +6,8 @@
     return;
   }
 
-  const INTERVAL_MS = 60000;
-  const CHECK_MS = 15000;
+  const INTERVAL_MS = 30000;
+  const CHECK_MS = 5000;
   const refreshUrl = dashboard.dataset.refreshUrl;
   const refreshButton = document.querySelector("[data-refresh]");
   const refreshLabel = refreshButton?.querySelector(".refresh-label");
