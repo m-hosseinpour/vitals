@@ -8,7 +8,7 @@
 
   const INTERVAL_MS = 30000;
   const CHECK_MS = 5000;
-  const refreshUrl = dashboard.dataset.refreshUrl;
+  const refreshPath = dashboard.dataset.refreshUrl;
   const refreshButton = document.querySelector("[data-refresh]");
   const refreshLabel = refreshButton?.querySelector(".refresh-label");
 
@@ -20,6 +20,7 @@
   };
 
   let busy = false;
+  let pendingManual = false;
   let lastFetch = Date.now();
   let resetTimer;
 
@@ -60,7 +61,15 @@
   }
 
   async function refresh(manual) {
-    if (busy || document.hidden) {
+    if (document.hidden) {
+      return;
+    }
+    if (busy) {
+      // A poll is already in flight. Dropping the press would silently skip the
+      // live provider read, so queue it to run as soon as the poll finishes.
+      if (manual) {
+        pendingManual = true;
+      }
       return;
     }
     busy = true;
@@ -73,12 +82,19 @@
       dashboard.setAttribute("aria-busy", "true");
     }
     try {
-      const response = await fetch(refreshUrl, {
+      const target = new URL(refreshPath, window.location.href);
+      // The auto poll can live with the server's cache. Pressing the button asks
+      // the server to read the provider now, past its cache and error backoff.
+      if (manual) {
+        target.searchParams.set("live", "1");
+      }
+      const response = await fetch(target, {
         headers: { Accept: "text/html" },
         credentials: "same-origin",
         cache: "no-store",
       });
       if (response.status === 401) {
+        pendingManual = false;
         window.location.assign("/login");
         return;
       }
@@ -96,7 +112,16 @@
       current.replaceWith(imported);
       updateHeaderTimestamp(imported);
       if (manual) {
-        setButtonState("success");
+        if (imported.dataset.liveFailed === "1") {
+          // A 200 can still mean the provider read failed and the server kept the
+          // last good numbers. That is not a successful live refresh.
+          setButtonState(
+            "error",
+            "دریافت زنده ممکن نشد؛ اعداد آخرین دریافت موفق نمایش داده می‌شوند."
+          );
+        } else {
+          setButtonState("success");
+        }
       }
     } catch (error) {
       setButtonState("error", "به‌روزرسانی ممکن نشد؛ اعداد قبلی نمایش داده می‌شوند.");
@@ -105,6 +130,10 @@
       if (manual) {
         dashboard.classList.remove("is-refreshing");
         dashboard.removeAttribute("aria-busy");
+      }
+      if (pendingManual) {
+        pendingManual = false;
+        refresh(true);
       }
     }
   }

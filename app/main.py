@@ -114,10 +114,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     @app.get("/", response_class=HTMLResponse)
-    async def dashboard(request: Request) -> HTMLResponse:
+    async def dashboard(request: Request, live: bool = False) -> HTMLResponse:
         if not auth.is_authenticated(request, settings):
             return RedirectResponse("/login", status_code=303)
-        accounts = await request.app.state.credit.summary()
+        accounts = await request.app.state.credit.summary(live=live)
         return _render(
             request,
             "dashboard.html",
@@ -130,16 +130,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "csrf": auth.csrf_token(request),
                 "packages_url": settings.packages_url,
                 "updated_at": _latest(accounts),
+                "live": live,
             },
         )
 
     @app.get("/partials/body", response_class=HTMLResponse)
-    async def dashboard_body(request: Request) -> HTMLResponse:
+    async def dashboard_body(request: Request, live: bool = False) -> HTMLResponse:
         if not auth.is_authenticated(request, settings):
             # A redirect here would be followed by fetch() and swap the login page
             # into the dashboard. A 401 lets the client navigate instead.
             return JSONResponse({"error": "unauthenticated"}, status_code=401)
-        accounts = await request.app.state.credit.summary()
+        accounts = await request.app.state.credit.summary(live=live)
         return _render(
             request,
             "_body.html",
@@ -151,6 +152,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "pulse": await asyncio.to_thread(read_pulse, settings.pulse_path),
                 "packages_url": settings.packages_url,
                 "updated_at": _latest(accounts),
+                "live": live,
             },
         )
 

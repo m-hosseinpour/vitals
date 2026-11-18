@@ -292,7 +292,9 @@ class CreditService:
 
     The cache keeps the dashboard from hitting AvalAI on every redraw, and a failed
     fetch is remembered for a while so a broken provider is not retried in a tight
-    loop. Cached data is always labelled as such in the UI.
+    loop. Cached data is always labelled as such in the UI. A caller that asks for
+    `live` data — the dashboard's refresh button — skips both waits and reads the
+    provider now, because that is what pressing refresh means.
     """
 
     def __init__(self, settings: Settings) -> None:
@@ -311,12 +313,14 @@ class CreditService:
     async def aclose(self) -> None:
         await self._client.aclose()
 
-    async def summary(self) -> tuple[AccountCredit, ...]:
+    async def summary(self, *, live: bool = False) -> tuple[AccountCredit, ...]:
         return tuple(
-            await asyncio.gather(*(self.get(account) for account in self._accounts))
+            await asyncio.gather(
+                *(self.get(account, live=live) for account in self._accounts)
+            )
         )
 
-    async def get(self, account: AccountConfig) -> AccountCredit:
+    async def get(self, account: AccountConfig, *, live: bool = False) -> AccountCredit:
         if not account.key:
             return _unconfigured(account)
 
@@ -328,19 +332,13 @@ class CreditService:
         async with lock:
             now_mono = time.monotonic()
             entry = self._cache.get(digest)
-            if entry is not None:
-                if (
-                    entry.payload is not None
-                    and now_mono - entry.fetched_mono < self._settings.cache_ttl
-                ):
-                    return _with_identity(
-                        analyze(
-                            entry.payload,
-                            source="cache",
-                            fetched_at=entry.fetched_at,
-                        ),
-                        account,
-                    )
+            # A live read is the user asking to retry now, so neither the successful
+            # answer's TTL nor the failure backoff applies. The lock still serializes
+            # it with any other request for the same key.
+            if entry is not None and not live:
+                # A failed read keeps the previous payload, and a manual live read
+                # can fail while that payload is still inside the TTL. The error
+                # view wins over the cache label so the failure is not hidden.
                 if (
                     entry.error
                     and now_mono - entry.error_mono < self._settings.retry_after
@@ -357,6 +355,18 @@ class CreditService:
                         )
                     return _unavailable(
                         account, entry.error, source="none", fetched_at=entry.fetched_at
+                    )
+                if (
+                    entry.payload is not None
+                    and now_mono - entry.fetched_mono < self._settings.cache_ttl
+                ):
+                    return _with_identity(
+                        analyze(
+                            entry.payload,
+                            source="cache",
+                            fetched_at=entry.fetched_at,
+                        ),
+                        account,
                     )
 
             try:
