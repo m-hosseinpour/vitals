@@ -18,3 +18,20 @@ configured remote(s) without waiting for a separate request.
   user's co-author trailer.
 - Push to the configured remote(s) and branch. If a push fails, report the
   error and the local commit; do not force-push.
+
+## Restart the local service after a change
+
+If `vitals.service` is running on this machine, restart it after a change that
+the running process loads, then verify the login page. The service runs from
+this repository, and filters, routes, and settings are read at process startup;
+templates alone reload.
+
+```bash
+if systemctl --user is-active --quiet vitals.service; then
+  systemctl --user restart vitals.service
+  curl -fsS -o /dev/null -H 'Host: localhost' http://127.0.0.1:8010/login
+fi
+```
+
+On a development machine without that service, skip this step. Do not install,
+start, or restart a service that was not already running there.
