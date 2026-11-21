@@ -155,4 +155,13 @@
       refresh(false);
     }
   }, CHECK_MS);
+
+  // A hidden tab neither polls nor receives updates; it may sit for hours.
+  // Refresh the moment it comes back, rather than making the user wait for the
+  // next interval tick, and skip that tick because lastFetch was just stamped.
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      refresh(false);
+    }
+  });
 })();
