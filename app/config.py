@@ -163,6 +163,9 @@ def load_settings() -> Settings:
     go_endpoint = _text("OPENCODE_GO_ENDPOINT", DEFAULT_GO_ENDPOINT)
     try:
         go_parts = urlsplit(go_endpoint)
+        # Reading `.port` validates it: httpx may leak an out-of-range port as a
+        # non-HTTPError while connecting, which would escape the card's error path.
+        _ = go_parts.port
         go_url_valid = go_parts.scheme == "https" and bool(go_parts.hostname)
     except ValueError:
         go_url_valid = False
