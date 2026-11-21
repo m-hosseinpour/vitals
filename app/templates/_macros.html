@@ -163,13 +163,7 @@
   </div>
   <progress class="bar{% if meter.tone %} bar-{{ meter.tone }}{% endif %}" value="{{ meter.percent|round|int }}" max="100" aria-label="{{ meter.label }}: {{ meter.percent|percent }} مصرف‌شده">{{ meter.percent|round|int }}٪</progress>
   <div class="go-meter-meta">
-    <span>
-      {% if left == "همین حالا" %}
-        زمان بازنشانی: همین حالا
-      {% else %}
-        بازنشانی پس از {{ left }} · ساعت {{ meter.resets_at|clock }} تهران
-      {% endif %}
-    </span>
+    <span>بازنشانی: {{ left }} · ساعت {{ meter.resets_at|clock }} تهران</span>
     {% if meter.limited %}<span class="chip chip-danger"><span class="chip-dot"></span>محدودشده</span>{% endif %}
   </div>
 </li>

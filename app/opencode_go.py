@@ -52,6 +52,11 @@ class Meter:
         return self.status == "rate-limited"
 
     @property
+    def note_label(self) -> str:
+        """The window name as it reads after «پنجرهٔ» in the note."""
+        return "۵ ساعته" if self.key == "rolling" else self.label
+
+    @property
     def tone(self) -> str:
         """A bar class suffix; used percent is bad, unlike AvalAI's remaining."""
         if self.limited or self.percent >= DANGER_PERCENT:
@@ -126,11 +131,11 @@ class GoUsage:
         limited = [meter for meter in self.meters if meter.limited]
         if limited:
             meter = max(limited, key=lambda item: item.percent)
-            return f"پنجرهٔ {meter.label} محدود شده و تا بازنشانی باید صبر کرد."
+            return f"پنجرهٔ {meter.note_label} محدود شده و تا بازنشانی باید صبر کرد."
         peak = max(self.meters, key=lambda item: item.percent)
         if peak.percent <= 0:
             return "هنوز از سهمیهٔ این حساب استفاده نشده است."
-        return f"بیشترین مصرف در پنجرهٔ {peak.label} است: {peak.percent:.0f}٪."
+        return f"بیشترین مصرف در پنجرهٔ {peak.note_label} است: {peak.percent:.0f}٪."
 
 
 class ParseError(ValueError):
@@ -156,7 +161,10 @@ def _percent(value: Any) -> float:
     """
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ParseError("percent is not a number")
-    number = float(value)
+    try:
+        number = float(value)
+    except OverflowError as exc:
+        raise ParseError("percent is out of range") from exc
     if not math.isfinite(number) or not 0 <= number <= 100:
         raise ParseError("percent is out of range")
     return number
@@ -417,10 +425,19 @@ class GoUsageService:
             fetched_at = datetime.now(UTC)
             try:
                 usage = analyze(payload, source="live", fetched_at=fetched_at)
-            except ParseError:
-                logger.warning(
-                    "could not parse the OpenCode Go response for %s", account.slot
-                )
+            except Exception as exc:
+                # The response is untrusted: one unreadable account must degrade
+                # to its own card, never take the whole dashboard down.
+                if isinstance(exc, ParseError):
+                    logger.warning(
+                        "could not parse the OpenCode Go response for %s: %s",
+                        account.slot,
+                        exc,
+                    )
+                else:
+                    logger.exception(
+                        "could not parse the OpenCode Go response for %s", account.slot
+                    )
                 message = "پاسخ OpenCode قابل خواندن نبود."
                 previous = entry.payload if entry else None
                 self._cache[digest] = _CacheEntry(
@@ -460,6 +477,9 @@ class GoUsageService:
             )
         except httpx.TimeoutException as exc:
             raise FetchError("OpenCode در زمان مقرر پاسخ نداد.") from exc
+        except httpx.InvalidURL as exc:
+            logger.warning("OpenCode Go endpoint is not a valid URL")
+            raise FetchError("آدرس OpenCode معتبر نیست.") from exc
         except httpx.HTTPError as exc:
             logger.warning("OpenCode Go request failed: %s", type(exc).__name__)
             raise FetchError("دسترسی به OpenCode برقرار نشد.") from exc

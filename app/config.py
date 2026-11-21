@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 
@@ -160,7 +161,12 @@ def load_settings() -> Settings:
     # The Go usage endpoint is undocumented and may move; keeping it configurable
     # means a provider change does not need a code release.
     go_endpoint = _text("OPENCODE_GO_ENDPOINT", DEFAULT_GO_ENDPOINT)
-    if not go_endpoint.startswith("https://"):
+    try:
+        go_parts = urlsplit(go_endpoint)
+        go_url_valid = go_parts.scheme == "https" and bool(go_parts.hostname)
+    except ValueError:
+        go_url_valid = False
+    if not go_url_valid:
         raise ConfigError("OPENCODE_GO_ENDPOINT must be an https:// URL")
 
     # No existence check: a mount can appear after the service starts, and the card
