@@ -184,11 +184,16 @@ code {
   padding: 18px 24px 26px;
 }
 
-.accounts {
+.accounts,
+.go-accounts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   align-items: start;
+}
+
+.go-accounts {
+  margin-bottom: 18px;
 }
 
 /* The pulse list is grouped into two columns, so its card is about half as tall
@@ -239,7 +244,8 @@ code {
   flex: 0 0 auto;
 }
 
-.account-buy {
+.account-buy,
+.account-link {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -249,17 +255,20 @@ code {
   white-space: nowrap;
 }
 
-.account-buy svg {
+.account-buy svg,
+.account-link svg {
   width: 15px;
   height: 15px;
   flex: 0 0 auto;
 }
 
-.account-buy:hover {
+.account-buy:hover,
+.account-link:hover {
   color: var(--accent);
 }
 
-.account-buy:focus-visible {
+.account-buy:focus-visible,
+.account-link:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
@@ -409,6 +418,60 @@ code {
   white-space: nowrap;
 }
 
+.go-meters {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.go-meter {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 7px;
+}
+
+.go-meter-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.go-meter-label {
+  font-size: 0.85rem;
+  font-weight: 550;
+}
+
+.go-meter-value {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.go-meter-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 10px;
+  flex-wrap: wrap;
+  font-size: 0.71rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.go-limit {
+  margin: 2px 0 0;
+  font-size: 0.73rem;
+  color: var(--muted);
+}
+
 /* The disk card shares a row with the taller pulse card. Its gauge grows to the
    row height and centers the free-space figure, so the card reads as one tile
    instead of leaving an empty block under the bar. */
@@ -537,6 +600,23 @@ code {
 }
 
 .bar-critical::-moz-progress-bar {
+  background: var(--danger);
+}
+
+/* Go windows show percent used, so growing values move toward danger. */
+.bar-warn::-webkit-progress-value {
+  background: var(--warn);
+}
+
+.bar-warn::-moz-progress-bar {
+  background: var(--warn);
+}
+
+.bar-danger::-webkit-progress-value {
+  background: var(--danger);
+}
+
+.bar-danger::-moz-progress-bar {
   background: var(--danger);
 }
 
@@ -856,7 +936,8 @@ input:focus-visible {
 }
 
 @media (max-width: 899px) {
-  .accounts {
+  .accounts,
+  .go-accounts {
     grid-template-columns: 1fr;
   }
 }

@@ -20,6 +20,7 @@ DEFAULT_PACKAGES_URL = (
     "https://chat.avalai.ir/platform/billing/packages"
     "?marketplace&q=%DA%A9%D8%AF%D8%B1&sort=price"
 )
+DEFAULT_GO_ENDPOINT = "https://opencode.ai/zen/go/v1/usage"
 
 
 class ConfigError(RuntimeError):
@@ -76,6 +77,25 @@ class AccountConfig:
 
 
 @dataclass(frozen=True)
+class GoAccountConfig:
+    slot: str
+    key: str
+    workspace_id: str
+    label: str
+
+    @property
+    def missing_env(self) -> tuple[str, ...]:
+        """Variable names this card still needs, in the order they are shown."""
+        prefix = f"OPENCODE_GO_{self.slot.upper()}"
+        missing = []
+        if not self.key:
+            missing.append(f"{prefix}_API_KEY")
+        if not self.workspace_id:
+            missing.append(f"{prefix}_WORKSPACE_ID")
+        return tuple(missing)
+
+
+@dataclass(frozen=True)
 class Settings:
     secret_key: str
     password_hash: str
@@ -93,6 +113,10 @@ class Settings:
     http_timeout: float
     personal: AccountConfig
     company: AccountConfig
+    go_endpoint: str
+    go_cache_ttl: int
+    go_personal: GoAccountConfig
+    go_company: GoAccountConfig
 
     @property
     def session_idle_seconds(self) -> int:
@@ -132,6 +156,12 @@ def load_settings() -> Settings:
     packages_url = _text("AVALAI_PACKAGES_URL", DEFAULT_PACKAGES_URL)
     if not packages_url.startswith("https://"):
         raise ConfigError("AVALAI_PACKAGES_URL must be an https:// URL")
+
+    # The Go usage endpoint is undocumented and may move; keeping it configurable
+    # means a provider change does not need a code release.
+    go_endpoint = _text("OPENCODE_GO_ENDPOINT", DEFAULT_GO_ENDPOINT)
+    if not go_endpoint.startswith("https://"):
+        raise ConfigError("OPENCODE_GO_ENDPOINT must be an https:// URL")
 
     # No existence check: a mount can appear after the service starts, and the card
     # shows a read failure rather than the process refusing to boot.
@@ -176,5 +206,21 @@ def load_settings() -> Settings:
             slot="company",
             key=_text("AVALAI_COMPANY_API_KEY"),
             label=_text("AVALAI_COMPANY_LABEL", "حساب دوم"),
+        ),
+        go_endpoint=go_endpoint,
+        # Go windows move slowly, and the client polls this endpoint less often
+        # than AvalAI credit, so it gets its own longer cache.
+        go_cache_ttl=_int("OPENCODE_GO_CACHE_TTL", 300, low=30, high=3600),
+        go_personal=GoAccountConfig(
+            slot="personal",
+            key=_text("OPENCODE_GO_PERSONAL_API_KEY"),
+            workspace_id=_text("OPENCODE_GO_PERSONAL_WORKSPACE_ID"),
+            label=_text("OPENCODE_GO_PERSONAL_LABEL", "OpenCode Go — شخصی"),
+        ),
+        go_company=GoAccountConfig(
+            slot="company",
+            key=_text("OPENCODE_GO_COMPANY_API_KEY"),
+            workspace_id=_text("OPENCODE_GO_COMPANY_WORKSPACE_ID"),
+            label=_text("OPENCODE_GO_COMPANY_LABEL", "OpenCode Go — شرکت"),
         ),
     )

@@ -3,8 +3,11 @@
   id="dashboard-content"
   data-updated-ago="{{ updated_at|ago }}"
   data-updated-clock="{{ updated_at|clock }}"
-  data-live-failed="{% if live and accounts|selectattr('error')|list %}1{% else %}0{% endif %}"
+  data-live-failed="{% if live and (accounts + go_accounts)|selectattr('error')|list %}1{% else %}0{% endif %}"
 >
+  <div class="go-accounts">
+    {% for account in go_accounts %}{{ ui.go_account_card(account) }}{% endfor %}
+  </div>
   <div class="accounts">
     {% for account in accounts %}{{ ui.account_card(account, packages_url) }}{% endfor %}
   </div>

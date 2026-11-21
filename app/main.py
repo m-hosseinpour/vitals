@@ -24,7 +24,8 @@ from . import auth
 from .avalai import AccountCredit, CreditService
 from .config import Settings, load_settings
 from .disk import read_disk
-from .formatting import ago, asset, clock, duration, money, percent
+from .formatting import ago, asset, clock, countdown, duration, money, percent
+from .opencode_go import GoUsageService
 from .pulse import read_pulse
 from .security import LoginThrottle, SecurityHeadersMiddleware
 
@@ -39,6 +40,7 @@ templates.env.filters.update(
         "money": money,
         "percent": percent,
         "duration": duration,
+        "countdown": countdown,
         "ago": ago,
         "clock": clock,
     }
@@ -100,10 +102,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.credit = CreditService(settings)
+        app.state.go_usage = GoUsageService(settings)
         try:
             yield
         finally:
             await app.state.credit.aclose()
+            await app.state.go_usage.aclose()
 
     app = FastAPI(
         title="Vitals",
@@ -117,12 +121,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def dashboard(request: Request, live: bool = False) -> HTMLResponse:
         if not auth.is_authenticated(request, settings):
             return RedirectResponse("/login", status_code=303)
-        accounts = await request.app.state.credit.summary(live=live)
+        accounts, go_accounts = await asyncio.gather(
+            request.app.state.credit.summary(live=live),
+            request.app.state.go_usage.summary(live=live),
+        )
         return _render(
             request,
             "dashboard.html",
             {
                 "accounts": accounts,
+                "go_accounts": go_accounts,
                 "disk": await asyncio.to_thread(
                     read_disk, settings.disk_path, settings.disk_threshold_gib
                 ),
@@ -140,12 +148,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             # A redirect here would be followed by fetch() and swap the login page
             # into the dashboard. A 401 lets the client navigate instead.
             return JSONResponse({"error": "unauthenticated"}, status_code=401)
-        accounts = await request.app.state.credit.summary(live=live)
+        accounts, go_accounts = await asyncio.gather(
+            request.app.state.credit.summary(live=live),
+            request.app.state.go_usage.summary(live=live),
+        )
         return _render(
             request,
             "_body.html",
             {
                 "accounts": accounts,
+                "go_accounts": go_accounts,
                 "disk": await asyncio.to_thread(
                     read_disk, settings.disk_path, settings.disk_threshold_gib
                 ),

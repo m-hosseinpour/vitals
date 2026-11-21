@@ -32,6 +32,24 @@ def duration(seconds: float | None) -> str:
     return f"{seconds / 86400:.1f} روز"
 
 
+def countdown(value: datetime | None) -> str:
+    """Precise time left until a reset: hours and minutes, or days and hours."""
+    if value is None:
+        return "—"
+    seconds = (value.astimezone(UTC) - datetime.now(UTC)).total_seconds()
+    if seconds <= 0:
+        return "همین حالا"
+    if seconds < 86400:
+        hours, minutes = divmod(int(seconds // 60), 60)
+        if hours and minutes:
+            return f"{hours} ساعت و {minutes} دقیقه"
+        if hours:
+            return f"{hours} ساعت"
+        return f"{minutes} دقیقه" if minutes else "کمتر از یک دقیقه"
+    days, hours = divmod(int(seconds // 3600), 24)
+    return f"{days} روز و {hours} ساعت" if hours else f"{days} روز"
+
+
 def ago(value: datetime | None) -> str:
     if value is None:
         return "—"
