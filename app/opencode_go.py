@@ -136,11 +136,11 @@ class GoUsage:
         limited = [meter for meter in self.meters if meter.limited]
         if limited:
             meter = max(limited, key=lambda item: item.percent)
-            return f"پنجرهٔ {meter.note_label} محدود شده و تا بازنشانی باید صبر کرد."
+            return f"پنجرهٔ {meter.note_label} محدود شده؛ تا بازنشانی باید صبر کرد."
         peak = max(self.meters, key=lambda item: item.percent)
         if peak.percent <= 0:
-            return "هنوز از سهمیهٔ این حساب استفاده نشده است."
-        return f"بیشترین مصرف در پنجرهٔ {peak.note_label} است: {peak.percent:.0f}٪."
+            return "هنوز از سهمیه استفاده نشده است."
+        return f"بیشترین مصرف: {peak.note_label} {peak.percent:.0f}٪."
 
 
 class ParseError(ValueError):

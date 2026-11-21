@@ -155,15 +155,15 @@
 {% endmacro %}
 
 {% macro go_meter_row(meter) %}
-{% set left = meter.resets_at|countdown %}
-<li class="go-meter">
+{% set full_left = meter.resets_at|countdown %}
+<li class="go-meter" title="بازنشانی: {{ full_left }} · ساعت {{ meter.resets_at|clock }} تهران">
   <div class="go-meter-top">
-    <span class="go-meter-label">{{ meter.label }}</span>
-    <span class="go-meter-value">{{ meter.remaining|percent }} باقی‌مانده</span>
+    <span class="go-meter-label">{{ meter.note_label }}</span>
+    <span class="go-meter-value">{{ meter.remaining|percent }} <small>باقی</small></span>
   </div>
-  <progress class="bar{% if meter.tone %} bar-{{ meter.tone }}{% endif %}" value="{{ meter.remaining|round|int }}" max="100" aria-label="{{ meter.label }}: {{ meter.remaining|percent }} باقی‌مانده">{{ meter.remaining|round|int }}٪</progress>
+  <progress class="bar{% if meter.tone %} bar-{{ meter.tone }}{% endif %}" value="{{ meter.remaining|round|int }}" max="100" aria-label="{{ meter.note_label }}: {{ meter.remaining|percent }} باقی‌مانده">{{ meter.remaining|round|int }}٪</progress>
   <div class="go-meter-meta">
-    <span>بازنشانی: {{ left }} · ساعت {{ meter.resets_at|clock }} تهران</span>
+    <span>بازنشانی {{ meter.resets_at|short_countdown }} · {{ meter.resets_at|clock }} تهران</span>
     {% if meter.limited %}<span class="chip chip-danger"><span class="chip-dot"></span>محدودشده</span>{% endif %}
   </div>
 </li>
@@ -191,7 +191,7 @@
     </div>
   </div>
   <p class="account-sub">
-    {{ account.source_text }}{% if account.fetched_at %} — {{ account.fetched_at|ago }} ({{ account.fetched_at|clock }}){% endif %}
+    {{ account.source_text }}{% if account.fetched_at %} — {{ account.fetched_at|ago }} ({{ account.fetched_at|clock }}){% endif %}{% if account.meters and account.limit_note %} · {{ account.limit_note }}{% endif %}
   </p>
 
   {% if not account.configured %}
@@ -207,7 +207,6 @@
       <ul class="go-meters">
         {% for meter in account.meters %}{{ go_meter_row(meter) }}{% endfor %}
       </ul>
-      {% if account.limit_note %}<p class="go-limit">{{ account.limit_note }}</p>{% endif %}
     </div>
   {% endif %}
 

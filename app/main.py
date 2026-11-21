@@ -24,7 +24,16 @@ from . import auth
 from .avalai import AccountCredit, CreditService
 from .config import Settings, load_settings
 from .disk import read_disk
-from .formatting import ago, asset, clock, countdown, duration, money, percent
+from .formatting import (
+    ago,
+    asset,
+    clock,
+    countdown,
+    duration,
+    money,
+    percent,
+    short_countdown,
+)
 from .opencode_go import GoUsageService
 from .pulse import read_pulse
 from .security import LoginThrottle, SecurityHeadersMiddleware
@@ -41,6 +50,7 @@ templates.env.filters.update(
         "percent": percent,
         "duration": duration,
         "countdown": countdown,
+        "short_countdown": short_countdown,
         "ago": ago,
         "clock": clock,
     }

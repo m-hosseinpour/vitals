@@ -111,7 +111,7 @@ code {
 .topbar {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 20px 24px 8px;
+  padding: 14px 24px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -129,9 +129,9 @@ code {
 
 .topbar-meta {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
   min-width: 0;
 }
 
@@ -165,6 +165,18 @@ code {
   height: 25px;
 }
 
+/* The dashboard header is denser than the login card, so only its mark shrinks. */
+.topbar .brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+
+.topbar .brand-mark svg {
+  width: 22px;
+  height: 22px;
+}
+
 .brand-text {
   display: flex;
   flex-direction: column;
@@ -178,22 +190,26 @@ code {
   letter-spacing: -0.01em;
 }
 
+.topbar .brand-text strong {
+  font-size: 1.05rem;
+}
+
 .shell {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 18px 24px 26px;
+  padding: 14px 24px 22px;
 }
 
 .accounts,
 .go-accounts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 14px;
   align-items: start;
 }
 
 .go-accounts {
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 /* The pulse list is grouped into two columns, so its card is about half as tall
@@ -202,14 +218,16 @@ code {
 .system {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 18px;
+  gap: 14px;
   align-items: stretch;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
-@media (min-width: 1080px) {
+@media (min-width: 900px) {
   .system {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
+    /* The disk card is one figure; the pulse list carries five rows and the
+       widths they need, so it gets the larger share. */
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 2.2fr);
   }
 }
 
@@ -217,8 +235,8 @@ code {
   min-width: 0;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 16px;
+  border-radius: 18px;
+  padding: 14px;
   box-shadow: var(--shadow);
 }
 
@@ -275,35 +293,35 @@ code {
 }
 
 .account-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--surface-2);
   border: 1px solid var(--line);
   color: var(--muted);
 }
 
 .account-icon-svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 
 .account-title h2 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 650;
   line-height: 1.5;
 }
 
 .account-sub {
-  margin: 0 0 10px;
-  padding-inline-start: 52px;
-  font-size: 0.71rem;
+  margin: 0 0 8px;
+  padding-inline-start: 44px;
+  font-size: 0.7rem;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .chip {
@@ -349,7 +367,7 @@ code {
 
 .account-body {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* Two packages fit side by side instead of stacking, so a second package does
@@ -357,15 +375,15 @@ code {
    column when the account card is too narrow or holds a single package. */
 .package-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
 }
 
 .main-card {
   background: color-mix(in oklab, var(--accent) 4%, var(--surface-2));
   border: 1px dashed var(--line-strong);
-  border-radius: 13px;
-  padding: 12px 14px;
+  border-radius: 12px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -396,7 +414,7 @@ code {
 
 .main-value {
   flex: 0 0 auto;
-  font-size: 0.87rem;
+  font-size: 1rem;
   font-weight: 650;
   line-height: 1.3;
   letter-spacing: -0.01em;
@@ -418,58 +436,69 @@ code {
   white-space: nowrap;
 }
 
+/* The three windows sit side by side as short columns instead of three stacked
+   cards, so the six Go numbers cost one strip rather than a screen. */
 .go-meters {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
 .go-meter {
   background: var(--surface-2);
   border: 1px solid var(--line);
-  border-radius: 13px;
-  padding: 10px 12px;
+  border-radius: 12px;
+  padding: 9px 10px;
   display: grid;
-  gap: 7px;
+  gap: 6px;
+  align-content: start;
 }
 
 .go-meter-top {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .go-meter-label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 550;
 }
 
 .go-meter-value {
   flex: 0 0 auto;
-  font-size: 0.8rem;
-  font-weight: 650;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.go-meter-value small {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--muted);
 }
 
 .go-meter-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px 10px;
+  gap: 4px 8px;
   flex-wrap: wrap;
-  font-size: 0.71rem;
+  font-size: 0.68rem;
   color: var(--muted);
+  line-height: 1.6;
   font-variant-numeric: tabular-nums;
 }
 
-.go-limit {
-  margin: 2px 0 0;
-  font-size: 0.73rem;
-  color: var(--muted);
+.go-meter-meta .chip {
+  font-size: 0.68rem;
+  padding: 1px 7px;
 }
 
 /* The disk card shares a row with the taller pulse card. Its gauge grows to the
@@ -480,7 +509,7 @@ code {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 /* Cards in the system row share one height, so a card whose message is short —
@@ -512,7 +541,7 @@ code {
 }
 
 .disk-card .main-value {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   letter-spacing: -0.02em;
 }
 
@@ -528,10 +557,10 @@ code {
 .pkg-card {
   background: var(--surface-2);
   border: 1px solid var(--line);
-  border-radius: 13px;
-  padding: 13px 14px;
+  border-radius: 11px;
+  padding: 9px 11px;
   display: grid;
-  gap: 7px;
+  gap: 5px;
 }
 
 .pkg-top {
@@ -542,14 +571,14 @@ code {
 }
 
 .pkg-name {
-  font-size: 0.87rem;
+  font-size: 0.8rem;
   font-weight: 550;
   min-width: 0;
 }
 
 .pkg-value {
   flex: 0 0 auto;
-  font-size: 0.87rem;
+  font-size: 0.8rem;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
 }
@@ -623,9 +652,9 @@ code {
 .pkg-meta {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 4px 10px;
   flex-wrap: wrap;
-  font-size: 0.71rem;
+  font-size: 0.68rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
@@ -650,7 +679,7 @@ code {
 }
 
 .notice {
-  margin: 14px 0 0;
+  margin: 10px 0 0;
   padding: 9px 12px;
   border-radius: 10px;
   border: 1px solid transparent;
@@ -681,7 +710,7 @@ code {
 /* Two columns of short rows read as three rows; the jobs keep their order down
    each column, right column first. The three rows match the five fixed jobs in
    pulse.py. */
-@media (min-width: 1080px) {
+@media (min-width: 900px) {
   .pulse-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: repeat(3, auto);
@@ -696,45 +725,53 @@ code {
 .pulse-row {
   background: var(--surface-2);
   border: 1px solid var(--line);
-  border-radius: 13px;
-  padding: 8px 12px;
+  border-radius: 11px;
+  padding: 6px 10px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 4px 12px;
+  gap: 4px 10px;
 }
 
 .pulse-main {
   display: flex;
-  flex-direction: column;
-  gap: 1px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
   min-width: 0;
 }
 
 .pulse-label {
-  font-size: 0.87rem;
+  font-size: 0.8rem;
   font-weight: 550;
   line-height: 1.6;
+  white-space: nowrap;
 }
 
 .pulse-time {
-  font-size: 0.71rem;
+  font-size: 0.68rem;
   color: var(--muted);
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
 .pulse-side {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 0 0 auto;
 }
 
 .pulse-count {
-  font-size: 0.74rem;
+  font-size: 0.68rem;
   color: var(--muted);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
+.pulse-row .chip {
+  font-size: 0.68rem;
+  padding: 1px 7px;
 }
 
 .pulse-error {
@@ -967,6 +1004,14 @@ input:focus-visible {
   }
 }
 
+/* Three quota columns get too narrow for the reset line; stack the windows as
+   short rows so the countdown and clock stay on one line each. */
+@media (max-width: 480px) {
+  .go-meters {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 560px) {
   .topbar {
     padding: 18px 14px 8px;
@@ -977,14 +1022,20 @@ input:focus-visible {
   }
 
   .account {
-    padding: 16px;
-    border-radius: 17px;
+    padding: 14px;
+    border-radius: 16px;
   }
 
   .brand-mark {
     width: 40px;
     height: 40px;
     border-radius: 12px;
+  }
+
+  .topbar .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
   }
 
   .chip {
