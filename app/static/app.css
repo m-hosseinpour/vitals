@@ -603,7 +603,7 @@ code {
   background: var(--danger);
 }
 
-/* Go windows show percent used, so growing values move toward danger. */
+/* Go windows show the quota left, so the bar drains toward danger. */
 .bar-warn::-webkit-progress-value {
   background: var(--warn);
 }

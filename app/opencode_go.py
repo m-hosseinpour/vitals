@@ -52,13 +52,18 @@ class Meter:
         return self.status == "rate-limited"
 
     @property
+    def remaining(self) -> float:
+        """Quota left in the window, so the bar starts full and drains with use."""
+        return 100.0 - self.percent
+
+    @property
     def note_label(self) -> str:
         """The window name as it reads after «پنجرهٔ» in the note."""
         return "۵ ساعته" if self.key == "rolling" else self.label
 
     @property
     def tone(self) -> str:
-        """A bar class suffix; used percent is bad, unlike AvalAI's remaining."""
+        """A bar class suffix; the draining bar turns bad as the quota runs out."""
         if self.limited or self.percent >= DANGER_PERCENT:
             return "danger"
         if self.percent >= WARN_PERCENT:

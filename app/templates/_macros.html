@@ -159,9 +159,9 @@
 <li class="go-meter">
   <div class="go-meter-top">
     <span class="go-meter-label">{{ meter.label }}</span>
-    <span class="go-meter-value">{{ meter.percent|percent }} مصرف‌شده</span>
+    <span class="go-meter-value">{{ meter.remaining|percent }} باقی‌مانده</span>
   </div>
-  <progress class="bar{% if meter.tone %} bar-{{ meter.tone }}{% endif %}" value="{{ meter.percent|round|int }}" max="100" aria-label="{{ meter.label }}: {{ meter.percent|percent }} مصرف‌شده">{{ meter.percent|round|int }}٪</progress>
+  <progress class="bar{% if meter.tone %} bar-{{ meter.tone }}{% endif %}" value="{{ meter.remaining|round|int }}" max="100" aria-label="{{ meter.label }}: {{ meter.remaining|percent }} باقی‌مانده">{{ meter.remaining|round|int }}٪</progress>
   <div class="go-meter-meta">
     <span>بازنشانی: {{ left }} · ساعت {{ meter.resets_at|clock }} تهران</span>
     {% if meter.limited %}<span class="chip chip-danger"><span class="chip-dot"></span>محدودشده</span>{% endif %}
