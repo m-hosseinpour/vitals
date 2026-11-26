@@ -461,7 +461,7 @@ code {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
 }
 
@@ -473,14 +473,16 @@ code {
 .go-meter-name {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
   flex-wrap: wrap;
 }
 
+/* A limited window trades the header's percentage for this compact badge, so
+   the window name and the badge keep one line at every width. */
 .go-meter-name .chip {
-  font-size: 0.68rem;
-  padding: 1px 7px;
+  font-size: 0.64rem;
+  padding: 1px 4px;
 }
 
 .go-meter-value {

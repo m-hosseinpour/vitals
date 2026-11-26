@@ -160,9 +160,11 @@
   <div class="go-meter-top">
     <span class="go-meter-name">
       <span class="go-meter-label">{{ meter.note_label }}</span>
-      {% if meter.limited %}<span class="chip chip-danger"><span class="chip-dot"></span>محدودشده</span>{% endif %}
+      {% if meter.limited %}<span class="chip chip-danger">محدودشده</span>{% endif %}
     </span>
-    <span class="go-meter-value">{{ meter.remaining|percent }} <small>باقی</small></span>
+    {% if not meter.limited %}
+      <span class="go-meter-value">{{ meter.remaining|percent }} <small>باقی</small></span>
+    {% endif %}
   </div>
   <progress class="bar{% if meter.tone %} bar-{{ meter.tone }}{% endif %}" value="{{ meter.remaining|round|int }}" max="100" aria-label="{{ meter.note_label }}: {{ meter.remaining|percent }} باقی‌مانده">{{ meter.remaining|round|int }}٪</progress>
   <div class="go-meter-meta">
