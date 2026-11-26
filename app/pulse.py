@@ -20,7 +20,6 @@ from pathlib import Path
 # the crier records; `note` is matched by the ordinary run (no `--only`) instead.
 ROWS = (
     ("note", "یادداشت روزانه"),
-    ("credit", "اعتبار AvalAI"),
     ("disk", "فضای دیسک"),
     ("changedetection", "صفحه‌های تغییر"),
     ("news", "خبرنامه"),

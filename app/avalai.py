@@ -160,7 +160,11 @@ def analyze(
         remaining = _num(raw.get("remaining_irt"))
         amount = _num(raw.get("amount_irt"))
         expires_in = (end - now).total_seconds() if end else None
-        spendable = (remaining or 0) > 0 and (end is None or end > now)
+        # An expired package cannot be spent and the panel does not list it, so it
+        # never enters the account's package set or its warnings.
+        if expires_in is not None and expires_in <= 0:
+            continue
+        spendable = (remaining or 0) > 0
         percent = None
         if remaining is not None and amount and amount > 0:
             percent = max(0.0, min(100.0, remaining / amount * 100))
@@ -176,8 +180,7 @@ def analyze(
             )
         )
     # The nearest expiry comes first. Packages without an end date follow the
-    # dated ones; expired packages stay after the live ones, where they are still
-    # counted for the warning about unused money.
+    # dated ones; a package with nothing left still sorts after the live ones.
     packages.sort(
         key=lambda p: (
             not p.spendable,
@@ -208,18 +211,6 @@ def analyze(
     if isinstance(grants, list) and grants:
         warnings.append(
             f"این حساب {len(grants)} آیتم دیگر در grants دارد که نمایش داده نمی‌شود."
-        )
-    # Money paid for and never used deserves to be visible rather than hidden
-    # behind the account's "out" state.
-    burned = [
-        p
-        for p in packages
-        if not p.spendable and (p.remaining or 0) > 0 and (p.expires_in or 0) <= 0
-    ]
-    if burned:
-        total = sum(p.remaining or 0 for p in burned)
-        warnings.append(
-            f"{len(burned)} بسته منقضی شده و {total:,.0f} تومان از آن استفاده نشده."
         )
 
     return AccountCredit(

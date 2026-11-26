@@ -470,6 +470,19 @@ code {
   font-weight: 550;
 }
 
+.go-meter-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.go-meter-name .chip {
+  font-size: 0.68rem;
+  padding: 1px 7px;
+}
+
 .go-meter-value {
   flex: 0 0 auto;
   font-size: 0.95rem;
@@ -494,11 +507,6 @@ code {
   color: var(--muted);
   line-height: 1.6;
   font-variant-numeric: tabular-nums;
-}
-
-.go-meter-meta .chip {
-  font-size: 0.68rem;
-  padding: 1px 7px;
 }
 
 /* The disk card shares a row with the taller pulse card. Its gauge grows to the
@@ -707,13 +715,13 @@ code {
   gap: 7px;
 }
 
-/* Two columns of short rows read as three rows; the jobs keep their order down
-   each column, right column first. The three rows match the five fixed jobs in
+/* Two columns of short rows read as two rows; the jobs keep their order down
+   each column, right column first. The two rows match the four fixed jobs in
    pulse.py. */
 @media (min-width: 900px) {
   .pulse-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, auto);
+    grid-template-rows: repeat(2, auto);
     grid-auto-flow: column;
     column-gap: 10px;
     /* A row with a sender error is taller than its pair; keep the healthy row
