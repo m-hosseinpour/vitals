@@ -225,7 +225,7 @@ code {
 
 @media (min-width: 900px) {
   .system {
-    /* The disk card is one figure; the pulse list carries five rows and the
+    /* The disk card is one figure; the pulse list carries four rows and the
        widths they need, so it gets the larger share. */
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 2.2fr);
   }
